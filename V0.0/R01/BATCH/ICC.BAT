@@ -1,0 +1,1 @@
+NMAKE /A /F R01ICC.CMD >1

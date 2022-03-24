@@ -1,0 +1,5 @@
+NMAKE  /A /F R01BND.CMD>2
+CD ..\OBJECT
+T:\SWIN\SSBUG MAIN.OMF
+cd ..\batch
+
