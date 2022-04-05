@@ -85,8 +85,8 @@ void run_pcb_node(int pcb)
 }
 
 /*------------------------------------*/
-void ini_pcb_list(int pcb,int task);
-void ini_pcb_list(int pcb,int task)
+void ini_pcb_list(void);
+void ini_pcb_list()
 {
 	int i;
 	for(i=0;i<MAX_PCB_NUM;i++)
