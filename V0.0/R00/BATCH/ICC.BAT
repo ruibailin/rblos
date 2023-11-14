@@ -1,1 +1,0 @@
-NMAKE /A /F R00ICC.CMD
