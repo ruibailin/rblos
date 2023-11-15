@@ -17,7 +17,7 @@
 #ifndef OS_HAVE_0CTR_H_
 #define OS_HAVE_0CTR_H_
 /*================================================================*/
-#define _OS_HAVE_L64_	1
+#define _OS_HAVE_C64_	1
 
 #if	_OS_HAVE_C32_			//cygwin32
 

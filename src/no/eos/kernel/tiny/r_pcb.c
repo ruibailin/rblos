@@ -1,22 +1,28 @@
-/*
+
+/*------------------------------------
  * r_pcb.c
+ * Create:  2021-10-16
+ * Author:  Steve Rui
+ *------------------------------------
+ * Record:
  *
- *  Created on: Apr 13, 2021
- *      Author: steve
+ *
+ *
+ *
+ *------------------------------------
  */
 
-
 #include "0ctr.h"
+#ifdef EOS_TINY_MODE
 /*================================================================*/
-#include	"r_pat.h"
-#include	"r_msg.h"
+#include	"../r_pat.h"
+#include	"../r_msg.h"
 
 /*================================================================*/
 typedef struct{
-	int   state;
-	int   event;
-	int	  stack;
-	int   timer[8];
+	unsigned char   state;
+	unsigned char   event;
+	unsigned char   timer[4];
 }PCB;
 
 /*------------------------------------*/
@@ -29,66 +35,64 @@ int	get_pcb_state(int pcb);
 int	get_pcb_state(int pcb)
 {
 	int state;
-	state=PCBPool[pcb].state;
+	state=((int)PCBPool[pcb].state)&0xff;
 	return(state);
 }
 /*------------------------------------*/
 void	set_pcb_state(int pcb,int ss);
 void	set_pcb_state(int pcb,int ss)
 {
-	PCBPool[pcb].state=ss;
+	PCBPool[pcb].state=(unsigned char)ss;
 }
 /*------------------------------------*/
 int	get_pcb_event(int pcb);
 int	get_pcb_event(int pcb)
 {
 	int event;
-	event=PCBPool[pcb].event;
+	event=((int)PCBPool[pcb].event)&0xff;
 	return(event);
 }
 /*------------------------------------*/
-void	set_pcb_event(int pcb,int ee);
-void	set_pcb_event(int pcb,int ee)
+void	set_pcb_event(int pcb,int event);
+void	set_pcb_event(int pcb,int event)
 {
-	PCBPool[pcb].event=ee;
+	PCBPool[pcb].event=(unsigned char)event;
 }
 /*------------------------------------*/
-int	get_pcb_timer(int pcb,int tno);
-int	get_pcb_timer(int pcb,int tno)
+int	get_pcb_timer(int pcb,int ptno);
+int	get_pcb_timer(int pcb,int ptno)
 {
 	int timer;
-	timer=PCBPool[pcb].timer[tno];
+	timer=((int)PCBPool[pcb].timer[ptno])&0xff;
 	return(timer);
 }
 /*------------------------------------*/
-void	set_pcb_timer(int pcb,int tno,int tt);
-void	set_pcb_timer(int pcb,int tno,int tt)
+void	set_pcb_timer(int pcb,int ptno,int ttno);
+void	set_pcb_timer(int pcb,int ptno,int ttno)
 {
-	PCBPool[pcb].timer[tno]=tt;
+	PCBPool[pcb].timer[ptno]=(unsigned char)ttno;
 }
 
 /*------------------------------------*/
 void run_pcb_node(int pcb);
 void run_pcb_node(int pcb)
 {
-	int ee;
+	int event;
 	void *in;
-	void ( *process)(void *in);
-	ee=PCBPool[pcb].event;
-	in=get_msg_body(ee);
-	process=get_pat_entry(pcb);
-	process(in);
+	event=((int)PCBPool[pcb].event)&0xff;
+	in=get_msg_body(event);
+	run_pat_entry(pcb,in);
 }
 
 /*------------------------------------*/
-void ini_pcb_list(int pcb,int task);
-void ini_pcb_list(int pcb,int task)
+void ini_pcb_list(void);
+void ini_pcb_list()
 {
 	int i;
 	for(i=0;i<MAX_PCB_NUM;i++)
 	{
-		PCBPool[pcb].event = 0;
-		PCBPool[pcb].state = 0;
+		PCBPool[i].event = 0;
+		PCBPool[i].state = 0;
 	}
 
 }
@@ -98,14 +102,14 @@ void run_pcb_list(void);
 void run_pcb_list(void)
 {
 	int i;
-	void ( *process)(void *in);
 
 	for(i=0;i<MAX_PCB_NUM;i++)
 	{
 		sys_pno = i;
-		process=get_pat_entry(i);
-		process((void *)0L);
+		run_pat_entry(i,(void *)0L);
 	}
 }
+
 /*================================================================*/
+#endif
 /* end of r_pcb.c */

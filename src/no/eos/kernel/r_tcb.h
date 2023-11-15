@@ -1,13 +1,21 @@
-/*
+
+/*------------------------------------
  * r_tcb.h
+ * Create:  2021-10-17
+ * Author:  Steve Rui
+ *------------------------------------
+ * Record:
  *
- *  Created on: Apr 13, 2021
- *      Author: steve
+ *
+ *
+ *
+ *------------------------------------
  */
 
-#ifndef SRC_NO_KERNEL_R_TCB_H_
-#define SRC_NO_KERNEL_R_TCB_H_
-#include "1imp.h"
+
+#include "0ctr.h"
+#ifndef EOS_KERNEL_R_TCB_H_
+#define EOS_KERNEL_R_TCB_H_
 /*================================================================*/
 extern	void	ini_tcb_list(void);
 extern	int		get_node_tcb(int tno,int pno);
@@ -19,4 +27,5 @@ extern	void	free_tcb_arrived(int node);
 extern	int		get_tcb_tno(int node);
 extern	int		get_tcb_pno(int node);
 /*================================================================*/
-#endif /* SRC_NO_KERNEL_R_TCB_H_ */
+#endif
+/* end of r_tcb.h */

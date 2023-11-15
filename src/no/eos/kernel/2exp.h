@@ -1,6 +1,6 @@
 
 /*------------------------------------
- * 0ctr.h
+ * 2exp.h
  * Create:  2021-10-17
  * Author:  Steve Rui
  *------------------------------------
@@ -13,12 +13,13 @@
  */
 
 
-
-#ifndef SRC_NO_0CTR_H_
-#define SRC_NO_0CTR_H_
+#ifndef EOS_KERNEL_2EXP_H_
+#define EOS_KERNEL_2EXP_H_
 /*================================================================*/
-#include "../0ctr.h"
-
+#include "r_msg.h"
+#include "r_tcb.h"
+#include "r_pat.h"
+#include "r_pcb.h"
 /*================================================================*/
 #endif
-/* end of 0ctr.h */
+/* end of 2exp.h */

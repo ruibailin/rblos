@@ -1,6 +1,6 @@
 
 /*------------------------------------
- * 0ctr.h
+ * kernel.h
  * Create:  2021-10-17
  * Author:  Steve Rui
  *------------------------------------
@@ -13,12 +13,12 @@
  */
 
 
-
-#ifndef SRC_NO_0CTR_H_
-#define SRC_NO_0CTR_H_
+#include "0ctr.h"
+#ifndef EOS_KENEL_H_
+#define EOS_KENEL_H_
 /*================================================================*/
-#include "../0ctr.h"
+#include "eos.h"
 
 /*================================================================*/
 #endif
-/* end of 0ctr.h */
+/* end of kernel.h */

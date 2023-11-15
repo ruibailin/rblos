@@ -1,14 +1,22 @@
-/*
+
+/*------------------------------------
  * verify.c
+ * Create:  2021-10-17
+ * Author:  Steve Rui
+ *------------------------------------
+ * Record:
  *
- *  Created on: Apr 13, 2021
- *      Author: steve
+ *
+ *
+ *
+ *------------------------------------
  */
 
-
 #include "0ctr.h"
+
 /*================================================================*/
 #include "kernel.h"
+#include "./kernel/2exp.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -37,7 +45,7 @@ void real_pro10(void *ptr)
 		ii=60;
 		SET(1,ii);
 //		printf(" proc %d set timer %d \n",pno,ii);
-		ASEND(20,ii+10,0,(void *)0L);
+		ASEND(2,ii+10,0,(void *)0L);
 	}
 }
 
@@ -121,14 +129,14 @@ void  watch_dog(void *ptr)
 
 }
 /*------------------------------------*/
-#include "./kernel/r_pat.h"
 void	ini_test_proc(void);
 void	ini_test_proc()
 {
-	set_pat_entry(10,&real_pro10);
-	set_pat_entry(20,&real_pro20);
-	set_pat_entry(21,&watch_dog);
+	set_pat_entry(1,&real_pro10);
+	set_pat_entry(2,&real_pro20);
+	set_pat_entry(3,&watch_dog);
 }
 
 /*================================================================*/
+
 /* end of verify.c */

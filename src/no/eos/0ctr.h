@@ -1,7 +1,7 @@
 
 /*------------------------------------
  * 0ctr.h
- * Create:  2021-10-17
+ * Create:  2021-10-16
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,12 +13,15 @@
  */
 
 
-
-#ifndef SRC_NO_0CTR_H_
-#define SRC_NO_0CTR_H_
+#ifndef SRC_NO_EOS_0CTR_H_
+#define SRC_NO_EOS_0CTR_H_
 /*================================================================*/
 #include "../0ctr.h"
 
+#define MIN_SCH_CYCLE	1*1000		//1000 us
+#if(MIN_SCH_CYCLE>10*1000)
+#error
+#endif
 /*================================================================*/
 #endif
 /* end of 0ctr.h */

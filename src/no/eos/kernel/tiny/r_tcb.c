@@ -1,181 +1,60 @@
-/*
+
+/*------------------------------------
  * r_tcb.c
+ * Create:  2021-10-17
+ * Author:  Steve Rui
+ *------------------------------------
+ * Record:
  *
- *  Created on: Apr 13, 2021
- *      Author: steve
+ *
+ *
+ *
+ *------------------------------------
  */
 
-
 #include "0ctr.h"
+#ifdef EOS_TINY_MODE
+#include "node.h"
 /*================================================================*/
-#include	"r_tcb.h"
-
-#define		TCB_LIST_NUM	12
-#define		MAX_NODE_NUM	MAX_TCB_NUM+TCB_LIST_NUM
-/*------------------------------------*/
-/*define Node used in list*/
-typedef struct{
-	int		last;
-	int		next;
-	int		root;
-} Node;
-typedef struct{
-  int  len;
-  int  rst;
-  int  tno;
-  int  pno;
-}TCB;
-
-/*------------------------------------*/
 #define   TimerIdleQueue     0
 #define   TimerL50msQueue    1
 #define   Timer50msQueue     2
-#define   Timer100msQueue    3
-#define   Timer500msQueue    4
-#define   Timer1sQueue       5
-#define   Timer5sQueue       6
-#define   Timer10sQueue      7
-#define   Timer50sQueue      8
-#define   Timer100sQueue     9
-#define   TimerBusyQueue     10
-static	TCB	 TCBPool[MAX_NODE_NUM];
-static	Node NodePool[MAX_NODE_NUM];
+#define   TimerBusyQueue     3
 
-/*================================================================*/
-/*Make a Node Is a Root In Queue */
-static	void  QueueNode(int item);
-static	void  QueueNode(int item)
-{
-  Node   *itemptr;
-
-  itemptr =&(NodePool[item]);
-  itemptr->next=item;
-  itemptr->last=item;
-  itemptr->root=item;
-
-}
+#define		TCB_LIST_NUM	TimerBusyQueue+1
+#define		TCB_NODE_NUM	MAX_TCB_NUM+TCB_LIST_NUM
+#if(TCB_NODE_NUM > 254)
+#error
+#endif
+/*------------------------------------*/
+typedef struct{
+  unsigned short  len;
+  unsigned short  rst;
+  unsigned char  tno;
+  unsigned char  pno;
+}TCB;
 
 /*------------------------------------*/
-/*Put a Node after one Node*/
-static	void  AppendNode(int last,int item);
-static	void  AppendNode(int last,int item)
-{
-  int  next,root;
-  Node   *lastptr;
-  Node   *itemptr;
-  Node   *nextptr;
-  lastptr =&(NodePool[last]);
-  root=lastptr->root;
-  next=lastptr->next;
-  lastptr->next=item;
 
-  itemptr =&(NodePool[item]);
-  itemptr->next=next;
-  itemptr->last=last;
-  itemptr->root=root;
-
-  nextptr =&(NodePool[next]);
-  nextptr->last=item;
-}
-/*------------------------------------*/
-/*Put a Node Befor one Node*/
-static	void  BeforeNode(int next,int item);
-static	void  BeforeNode(int next,int item)
-{
-  int  last,root;
-  Node   *nextptr;
-  Node   *itemptr;
-  Node   *lastptr;
-
-  nextptr =&(NodePool[next]);
-  root=nextptr->root;
-  last=nextptr->last;
-  nextptr->last=item;
-
-  itemptr =&(NodePool[item]);
-  itemptr->next=next;
-  itemptr->last=last;
-  itemptr->root=root;
-
-  lastptr =&(NodePool[last]);
-  lastptr->next=item;
-
-}
-/*------------------------------------*/
-/*Delete a Node From Queue */
-static	void  DeleteNode(int item);
-static	void  DeleteNode(int item)
-{
-  int last,next;
-  Node   *itemptr;
-  Node   *lastptr;
-  Node   *nextptr;
-
-  itemptr =&(NodePool[item]);
-  next=itemptr->next;
-  if(next == item)	 return;
-  last=itemptr->last;
-  itemptr->last=item;
-  next=itemptr->next;
-  itemptr->next=item;
-  itemptr->root=item;
-
-  lastptr =&(NodePool[last]);
-  lastptr->next=next;
-
-  nextptr =&(NodePool[next]);
-  nextptr->last=last;
-
-}
-/*------------------------------------*/
-/*Find a Node In A Queue */
-static	int  LocateNode(int root,int item);
-static	int  LocateNode(int root,int item)
-{
-  int next;
-  next=NodePool[root].next;
-  for(;;)
-  {
-    if(next == root)	return(root);	/*no find*/
-	if(next == item)	return(item);	/*find the node*/
-    next=NodePool[next].next;
-  }
-}
-
-
-/*------------------------------------*/
-/*Browse a Node In Queue */
-static	int  BrowseNode(int root);
-static	int  BrowseNode(int root)
-{
-  int next,size;
-  size=0;
-  next=NodePool[root].next;
-  for(;;)
-  {
-    if(next == root) break;
-    next=NodePool[next].next;
-	size++;
-  }
-  return(size);
-}
+static	TCB	 TCBPool[TCB_NODE_NUM];
+static	Node NodePool[TCB_NODE_NUM];
 
 /*------------------------------------*/
 /*initiate all node for future use */
 static	void  ini_all_node(void);
 static	void  ini_all_node(void)
 {
-  int ii;
-  for(ii=0;ii<MAX_NODE_NUM;ii++)
+  unsigned char ii;
+  for(ii=0;ii<TCB_NODE_NUM;ii++)
   {
-	QueueNode(ii);
+	QueueNode(NodePool,ii);
   }
 }
 
 /*------------------------------------*/
-#define  get_node_next(node)	NodePool[(node)].next
-#define  get_node_last(node)	NodePool[(node)].last
-#define  get_node_root(node)	NodePool[(node)].root
+#define  get_node_next(node)	((int)NodePool[(node)].next)&0xff
+#define  get_node_last(node)	((int)NodePool[(node)].last)&0xff
+#define  get_node_root(node)	((int)NodePool[(node)].root)&0xff
 
 
 /*================================================================*/
@@ -184,26 +63,7 @@ static	void  ini_all_node(void)
 static  int  FindQueue(int  len);
 static  int  FindQueue(int  len)
 {
-  if(len>=100)
-  {
-    if(len<500)
-    return(Timer1sQueue);
-    if(len<1000)
-    return(Timer5sQueue);
-    if(len<5000)
-    return(Timer10sQueue);
-
-    return(Timer50sQueue);
-  }
-  else
-  {
-    if(len>=50)
-    return(Timer500msQueue);
-    if(len>=10)
-    return(Timer100msQueue);
-
     return(Timer50msQueue);
-  }
 }
 /*------------------------------------*/
 static void ini_list_head(void);
@@ -211,22 +71,15 @@ static void ini_list_head(void)
 {
 	TCBPool[TimerL50msQueue].len=0;
 	TCBPool[Timer50msQueue].len=5;
-	TCBPool[Timer100msQueue].len=10;
-	TCBPool[Timer500msQueue].len=50;
-	TCBPool[Timer1sQueue].len=100;
-	TCBPool[Timer5sQueue].len=500;
-	TCBPool[Timer10sQueue].len=1000;
-	TCBPool[Timer50sQueue].len=5000;
-	TCBPool[Timer100sQueue].len=10000;
 }
 /*------------------------------------*/
 static void ini_idle_list(void);
 static void ini_idle_list(void)
 {
 	int ii;
-	for(ii=TCB_LIST_NUM;ii<MAX_NODE_NUM;ii++)
+	for(ii=TCB_LIST_NUM;ii<TCB_NODE_NUM;ii++)
 	{
-		BeforeNode(TimerIdleQueue,ii);
+		BeforeNode(NodePool,TimerIdleQueue,ii);
 	}
 }
 /*===========================================================================*/
@@ -244,9 +97,9 @@ int get_node_tcb(int tno,int pno)
 {
 	int node;
 	node=get_node_next(TimerIdleQueue);
-	DeleteNode(node);
-	TCBPool[node].tno=tno;
-	TCBPool[node].pno=pno;
+	DeleteNode(NodePool,node);
+	TCBPool[node].tno=(unsigned char)tno;
+	TCBPool[node].pno=(unsigned char)pno;
 	return(node);
 }
 
@@ -259,7 +112,7 @@ void set_node_tcb(int node,int len)
 	TCB		*node_ptr,*root_ptr;
 
 	node_ptr=(TCB  *)&(TCBPool[node]);
-	node_ptr->len=len;
+	node_ptr->len=(unsigned short)len;
 
 	if(len < 5)
 	{
@@ -267,7 +120,7 @@ void set_node_tcb(int node,int len)
 			root=TimerBusyQueue;
 		else
 			root=TimerL50msQueue;
-		BeforeNode(root,node);
+		BeforeNode(NodePool,root,node);
 		return;
 	}
 
@@ -276,7 +129,7 @@ void set_node_tcb(int node,int len)
 	node_ptr->len = node_ptr->len - root_ptr->len;
 	node_ptr->rst = root_ptr->len - root_ptr->rst;
 	root_ptr->rst = root_ptr->len;
-	BeforeNode(root,node);	/*Put the TCB in tail of Queue*/
+	BeforeNode(NodePool,root,node);	/*Put the TCB in tail of Queue*/
 }
 /*------------------------------------*/
 void reset_node_tcb(int node);
@@ -304,8 +157,8 @@ void reset_node_tcb(int node)
 			TCBPool[next].rst += TCBPool[node].rst;
            break;
   }
-  DeleteNode(node);
-  BeforeNode(TimerIdleQueue,node);
+  DeleteNode(NodePool,node);
+  BeforeNode(NodePool,TimerIdleQueue,node);
 }
 /*------------------------------------*/
 /*One Way To dec timer(only for L50msque)*/
@@ -325,8 +178,8 @@ static  void dec_tcb_node(int  root)
 		TCBPool[node].len--;
     else
     {
-		DeleteNode(node);
-		BeforeNode(TimerBusyQueue,node);
+		DeleteNode(NodePool,node);
+		BeforeNode(NodePool,TimerBusyQueue,node);
     }
     if(next == root)    break;          /*Meet Queue Tail */
     node=next;
@@ -337,7 +190,7 @@ static  void dec_tcb_list(int  root);
 static  void dec_tcb_list(int  root)
 {
   int node,next;
-  int len;
+  unsigned short len;
 
   if(TCBPool[root].rst == 0)
   return;                                 /*Queue Is Empty*/
@@ -352,7 +205,7 @@ static  void dec_tcb_list(int  root)
   {
     next=get_node_next(node);
 
-	DeleteNode(node);
+	DeleteNode(NodePool,node);
 	len=TCBPool[node].len;
     set_node_tcb(node,len);                    /*Time Out in this queue*/
 
@@ -372,13 +225,6 @@ void run_tcb_list()
 {
   dec_tcb_node(TimerL50msQueue);
   dec_tcb_list(Timer50msQueue);
-  dec_tcb_list(Timer100msQueue);
-  dec_tcb_list(Timer500msQueue);
-  dec_tcb_list(Timer1sQueue);
-  dec_tcb_list(Timer5sQueue);
-  dec_tcb_list(Timer10sQueue);
-  dec_tcb_list(Timer50sQueue);
-  dec_tcb_list(Timer100sQueue);
 }
 /*------------------------------------*/
 int	get_tcb_arrived(void);
@@ -388,7 +234,7 @@ int get_tcb_arrived()
   root=TimerBusyQueue;
   next=get_node_next(root);
   if(next == root)	return(TimerIdleQueue);
-  DeleteNode(next);
+  DeleteNode(NodePool,next);
   return(next);
 }
 /*------------------------------------*/
@@ -397,7 +243,7 @@ void free_tcb_arrived(int node)
 {
   int root;
   root=TimerIdleQueue;
-  BeforeNode(root,node);     /*Add node to Idle Queue*/
+  BeforeNode(NodePool,root,node);     /*Add node to Idle Queue*/
 }
 
 /*------------------------------------*/
@@ -405,7 +251,7 @@ int	get_tcb_tno(int node);
 int get_tcb_tno(int node)
 {
   int tno;
-  tno=TCBPool[node].tno;
+  tno=((int)TCBPool[node].tno)&0xff;
   return(tno);
 }
 /*------------------------------------*/
@@ -413,9 +259,11 @@ int	get_tcb_pno(int node);
 int get_tcb_pno(int node)
 {
   int pno;
-  pno=TCBPool[node].pno;
+  pno=((int)TCBPool[node].pno)&0xff;
   return(pno);
 }
 
+
 /*================================================================*/
+#endif
 /* end of r_tcb.c */
