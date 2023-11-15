@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-16
+ * r_delay.h
+ * Create:  2021-10-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,17 +13,12 @@
  */
 
 
-
-#ifndef EOS_KERNEL_0CTR_H_
-#define EOS_KERNEL_0CTR_H_
-
-#include "../0ctr.h"
+#ifndef HAVE_LINUX_R_DELAY_H_
+#define HAVE_LINUX_R_DELAY_H_
 /*================================================================*/
-#define EOS_TINY_MODE	0		//8 bit system or tiny ram
-#define	EOS_SMALL_MODE	0		//16 bit system
-#define EOS_MEDIUM_MODE	1		//32 bit system
-#define EOS_HUGE_MODE	0		//64 bit system
+extern void os_delay_us(int us);
+extern void os_delay_ms(int ms);
 
 /*================================================================*/
 #endif
-/* end of 0ctr.h */
+/* end of r_delay.h */

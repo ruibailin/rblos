@@ -84,13 +84,14 @@ void	ASEND(int dd,int ee,int ll,void *in)
 }
 /*================================================================*/
 /*------------------------------------*/
+#define TIMER_UNIT	((10*1000)/(EOS_SCH_CYCLE))
 void SET(int tno,int ll);
 void SET(int tno,int ll)
 {
 	int node;
 	node=get_node_tcb(tno,sys_pno);
 	set_pcb_timer(sys_pno,tno,node);
-	set_node_tcb(node,ll);
+	set_node_tcb(node,ll*TIMER_UNIT);
 }
 /*------------------------------------*/
 void KILL(int tno);

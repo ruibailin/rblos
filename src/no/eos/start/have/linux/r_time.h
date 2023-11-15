@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-16
+ * r_time.h
+ * Create:  2021-10-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,17 +13,11 @@
  */
 
 
-
-#ifndef EOS_KERNEL_0CTR_H_
-#define EOS_KERNEL_0CTR_H_
-
-#include "../0ctr.h"
+#ifndef HAVE_LINUX_R_TIME_H_
+#define HAVE_LINUX_R_TIME_H_
 /*================================================================*/
-#define EOS_TINY_MODE	0		//8 bit system or tiny ram
-#define	EOS_SMALL_MODE	0		//16 bit system
-#define EOS_MEDIUM_MODE	1		//32 bit system
-#define EOS_HUGE_MODE	0		//64 bit system
-
+extern long int	os_get_ms(void);
+extern long int	os_get_us(void);
 /*================================================================*/
 #endif
-/* end of 0ctr.h */
+/* end of r_time.h */

@@ -1,7 +1,7 @@
 
 /*------------------------------------
  * 0ctr.h
- * Create:  2021-10-16
+ * Create:  2021-10-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,17 +13,18 @@
  */
 
 
-
-#ifndef EOS_KERNEL_0CTR_H_
-#define EOS_KERNEL_0CTR_H_
-
 #include "../0ctr.h"
+#if	EOS_WITH_OS
+#ifndef START_HAVE_0CTR_H_
+#define START_HAVE_0CTR_H_
 /*================================================================*/
-#define EOS_TINY_MODE	0		//8 bit system or tiny ram
-#define	EOS_SMALL_MODE	0		//16 bit system
-#define EOS_MEDIUM_MODE	1		//32 bit system
-#define EOS_HUGE_MODE	0		//64 bit system
+#define	EOS_IN_LINUX		1
+#define	EOS_IN_CYGWIN		0
+#define	EOS_IN_NUTTX		0
+#define	EOS_IN_DOS			0
+#define	EOS_IN_WINDOW		0
 
 /*================================================================*/
+#endif
 #endif
 /* end of 0ctr.h */

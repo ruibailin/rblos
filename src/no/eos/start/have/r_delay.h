@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-16
+ * r_delay.h
+ * Create:  2021-10-21
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,14 +13,13 @@
  */
 
 
-#ifndef SRC_NO_EOS_0CTR_H_
-#define SRC_NO_EOS_0CTR_H_
-/*================================================================*/
 
-#define EOS_SCH_CYCLE	1*1000		//1000 us
-#if(EOS_SCH_CYCLE>10*1000)
-#error
-#endif
+#ifndef START_HAVE_R_DELAY_H_
+#define START_HAVE_R_DELAY_H_
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+extern void os_delay_us(int us);
+extern void os_delay_ms(int ms);
+
+/*================================================================*/
+#endif 
+/* end of r_delay.h */

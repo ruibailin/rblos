@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * verify.c
- * Create:  2021-10-17
+ * r_test.c
+ * Create:  2021-10-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,10 +13,10 @@
  */
 
 #include "0ctr.h"
-
+#ifdef TEST_IN_LINUX
 /*================================================================*/
-#include "kernel.h"
-#include "./kernel/2exp.h"
+/*================================================================*/
+#include "../../../eos.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -32,24 +32,24 @@ void real_pro10(void *ptr)
 	pno=SELF();
 	ee=EVENT();
 
-//	printf(" proc %d event %d \n",pno,ee);
-	if(ss ==0)
+	switch(ss)
 	{
+	case 0:
 		ii=60;
 		SET(1,ii);
-//		printf(" proc %d set timer %d \n",pno,ii);
+		printf(" proc %d set timer %d \n",pno,ii);
 		NEXT_STATE(1);
-	}
-	else
-	{
+		break;
+	case 1:
 		ii=60;
 		SET(1,ii);
 //		printf(" proc %d set timer %d \n",pno,ii);
 		ASEND(2,ii+10,0,(void *)0L);
+		break;
+	default:
+		break;
 	}
 }
-
-
 
 /*================================================================*/
 static	short int	last_ms;
@@ -86,9 +86,9 @@ void real_pro20(void *ptr)
 			ii=this_ms-last_ms;
 		else
 			ii=1000-last_ms+this_ms;
-		if(ii>604)
-			printf(" wrong %d \n",ii);
-		else
+//		if(ii>604)
+//			printf(" wrong %d \n",ii);
+//		else
 //			printf(" proc %d event %d,timer interval %d\n",pno,ee,ii);
 		last_ms=this_ms;
 	}
@@ -101,7 +101,7 @@ static  unsigned int hour=0;
 void  watch_dog(void *ptr);
 void  watch_dog(void *ptr)
 {
-  int xx,yy;
+  int xx;
   time_t timep;
   struct tm *p;
 
@@ -129,14 +129,22 @@ void  watch_dog(void *ptr)
 
 }
 /*------------------------------------*/
-void	ini_test_proc(void);
-void	ini_test_proc()
+#include "../../../kernel/r_pat.h"
+void	ini_def_proc(void);
+void	ini_def_proc()
 {
 	set_pat_entry(1,&real_pro10);
 	set_pat_entry(2,&real_pro20);
 	set_pat_entry(3,&watch_dog);
 }
 
-/*================================================================*/
 
-/* end of verify.c */
+/*================================================================*/
+#else
+void ini_def_proc(void);
+void ini_def_proc()
+{
+
+}
+#endif
+/* end of r_test.c */

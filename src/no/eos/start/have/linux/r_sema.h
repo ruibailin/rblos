@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-16
+ * r_sema.h
+ * Create:  2021-10-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,14 +13,12 @@
  */
 
 
-#ifndef SRC_NO_EOS_0CTR_H_
-#define SRC_NO_EOS_0CTR_H_
+#ifndef HAVE_LINUX_R_SEMA_H_
+#define HAVE_LINUX_R_SEMA_H_
 /*================================================================*/
+extern	void  	os_wait_sema(void);
+extern	void  	os_post_sema(void);
+extern	void 	os_init_sema(void);
 
-#define EOS_SCH_CYCLE	1*1000		//1000 us
-#if(EOS_SCH_CYCLE>10*1000)
-#error
-#endif
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+/* end of r_sema.h */

@@ -13,10 +13,10 @@
  */
 
 #include "0ctr.h"
-#if EOS_TINY_MODE
+#if EOS_SMALL_MODE
 /*================================================================*/
 #define	 PAT_NODE_NUM	MAX_PAT_NUM
-#if(PAT_NODE_NUM > 254)
+#if(PAT_NODE_NUM > 32767)
 #error
 #endif
 

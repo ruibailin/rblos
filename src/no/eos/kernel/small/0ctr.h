@@ -14,16 +14,15 @@
 
 
 
-#ifndef EOS_KERNEL_0CTR_H_
-#define EOS_KERNEL_0CTR_H_
-
+#ifndef EOS_KERNEL_SMALL_0CTR_H_
+#define EOS_KERNEL_SMALL_0CTR_H_
 #include "../0ctr.h"
+#if	EOS_SMALL_MODE
 /*================================================================*/
-#define EOS_TINY_MODE	0		//8 bit system or tiny ram
-#define	EOS_SMALL_MODE	0		//16 bit system
-#define EOS_MEDIUM_MODE	1		//32 bit system
-#define EOS_HUGE_MODE	0		//64 bit system
-
+#define		MAX_MSG_NUM		120
+#define		MAX_PAT_NUM		60
+#define		MAX_TCB_NUM		160
 /*================================================================*/
+#endif
 #endif
 /* end of 0ctr.h */

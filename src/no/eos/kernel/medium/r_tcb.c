@@ -13,25 +13,30 @@
  */
 
 #include "0ctr.h"
-#if EOS_TINY_MODE
+#if EOS_MEDIUM_MODE
 #include "node.h"
 /*================================================================*/
 #define   TimerIdleQueue     0
 #define   TimerL50msQueue    1
 #define   Timer50msQueue     2
-#define   TimerBusyQueue     3
+#define   Timer100msQueue    3
+#define   Timer500msQueue    4
+#define   Timer1sQueue       5
+#define   Timer5sQueue       6
+#define   Timer10sQueue      7
+#define   TimerBusyQueue     8
 
 #define		TCB_LIST_NUM	TimerBusyQueue+1
 #define		TCB_NODE_NUM	MAX_TCB_NUM+TCB_LIST_NUM
-#if(TCB_NODE_NUM > 254)
+#if(TCB_NODE_NUM > 32767)
 #error
 #endif
 /*------------------------------------*/
 typedef struct{
-  unsigned short  len;
-  unsigned short  rst;
-  unsigned char  tno;
-  unsigned char  pno;
+  int  len;
+  int  rst;
+  int  tno;
+  int  pno;
 }TCB;
 
 /*------------------------------------*/
@@ -44,7 +49,7 @@ static	Node NodePool[TCB_NODE_NUM];
 static	void  ini_all_node(void);
 static	void  ini_all_node(void)
 {
-  unsigned char ii;
+  int ii;
   for(ii=0;ii<TCB_NODE_NUM;ii++)
   {
 	QueueNode(NodePool,ii);
@@ -52,9 +57,9 @@ static	void  ini_all_node(void)
 }
 
 /*------------------------------------*/
-#define  get_node_next(node)	((int)NodePool[(node)].next)&0xff
-#define  get_node_last(node)	((int)NodePool[(node)].last)&0xff
-#define  get_node_root(node)	((int)NodePool[(node)].root)&0xff
+#define  get_node_next(node)	NodePool[(node)].next
+#define  get_node_last(node)	NodePool[(node)].last
+#define  get_node_root(node)	NodePool[(node)].root
 
 
 /*================================================================*/
@@ -63,7 +68,24 @@ static	void  ini_all_node(void)
 static  int  FindQueue(int  len);
 static  int  FindQueue(int  len)
 {
-    return(Timer50msQueue);
+	  if(len>=100)
+	  {
+		    if(len<500)
+		    return(Timer1sQueue);
+		    if(len<1000)
+		    return(Timer5sQueue);
+
+		    return(Timer10sQueue);
+	  }
+	  else
+	  {
+	    if(len>=50)
+	    return(Timer500msQueue);
+	    if(len>=10)
+	    return(Timer100msQueue);
+
+	    return(Timer50msQueue);
+	  }
 }
 /*------------------------------------*/
 static void ini_list_head(void);
@@ -71,6 +93,11 @@ static void ini_list_head(void)
 {
 	TCBPool[TimerL50msQueue].len=0;
 	TCBPool[Timer50msQueue].len=5;
+	TCBPool[Timer100msQueue].len=10;
+	TCBPool[Timer500msQueue].len=50;
+	TCBPool[Timer1sQueue].len=100;
+	TCBPool[Timer5sQueue].len=500;
+	TCBPool[Timer10sQueue].len=1000;
 }
 /*------------------------------------*/
 static void ini_idle_list(void);
@@ -98,8 +125,8 @@ int get_node_tcb(int tno,int pno)
 	int node;
 	node=get_node_next(TimerIdleQueue);
 	DeleteNode(NodePool,node);
-	TCBPool[node].tno=(unsigned char)tno;
-	TCBPool[node].pno=(unsigned char)pno;
+	TCBPool[node].tno=(int)tno;
+	TCBPool[node].pno=(int)pno;
 	return(node);
 }
 
@@ -112,7 +139,7 @@ void set_node_tcb(int node,int len)
 	TCB		*node_ptr,*root_ptr;
 
 	node_ptr=(TCB  *)&(TCBPool[node]);
-	node_ptr->len=(unsigned short)len;
+	node_ptr->len=(int)len;
 
 	if(len < 5)
 	{
@@ -190,7 +217,7 @@ static  void dec_tcb_list(int  root);
 static  void dec_tcb_list(int  root)
 {
   int node,next;
-  unsigned short len;
+  int len;
 
   if(TCBPool[root].rst == 0)
   return;                                 /*Queue Is Empty*/
@@ -223,8 +250,13 @@ static  void dec_tcb_list(int  root)
 void run_tcb_list(void);
 void run_tcb_list()
 {
-	dec_tcb_list(Timer50msQueue);
-	dec_tcb_node(TimerL50msQueue);
+  dec_tcb_list(Timer10sQueue);
+  dec_tcb_list(Timer5sQueue);
+  dec_tcb_list(Timer1sQueue);
+  dec_tcb_list(Timer500msQueue);
+  dec_tcb_list(Timer100msQueue);
+  dec_tcb_list(Timer50msQueue);
+  dec_tcb_node(TimerL50msQueue);
 }
 /*------------------------------------*/
 int	get_tcb_arrived(void);
@@ -251,7 +283,7 @@ int	get_tcb_tno(int node);
 int get_tcb_tno(int node)
 {
   int tno;
-  tno=((int)TCBPool[node].tno)&0xff;
+  tno=TCBPool[node].tno;
   return(tno);
 }
 /*------------------------------------*/
@@ -259,7 +291,7 @@ int	get_tcb_pno(int node);
 int get_tcb_pno(int node)
 {
   int pno;
-  pno=((int)TCBPool[node].pno)&0xff;
+  pno=TCBPool[node].pno;
   return(pno);
 }
 

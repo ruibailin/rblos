@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * schedule.c
- * Create:  2021-10-17
+ * eos.c
+ * Create:  2021-10-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -54,15 +54,17 @@ static	int	sch_one_tcb_msg()
 
 }
 
-
 /*================================================================*/
+//eos_time should be called by every EOS_SCH_CYCLE ms
 void eos_time(void);
 void eos_time()
 {
 	run_tcb_list();
 }
 
-
+//ini_def_proc() must be implemented in start directory to initialize default process.
+extern void ini_def_proc(void);
+extern void cal_cpu_rate(void);
 void eos_main();
 void eos_main()
 {
@@ -73,6 +75,8 @@ void eos_main()
 	ini_pat_table();
 	ini_pcb_list();
 
+	ini_def_proc();
+
 	run_pcb_list();
 
 	for(;;)
@@ -82,17 +86,10 @@ void eos_main()
 		ret1 |= ret2;
 		if(ret1)
 			continue;
-		sys_pno = 0;		//To Run idle process
-		run_pat_entry(0,(void *)0L);
+		cal_cpu_rate();
 	}
 }
 
-int no_main(int argc, char **argv);
-int no_main(int argc, char **argv)
-{
-	eos_main();
-	return 0;
-}
 /*================================================================*/
 
-/* end of schedule.c */
+/* end of eos.c */
