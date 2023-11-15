@@ -16,92 +16,141 @@
 
 
 /*================================================================*/
-int	sys_pno=0;
+extern int	knl_this_pno;
 /*================================================================*/
-#include "r_msg.h"
-#include "r_pat.h"
-#include "r_tcb.h"
-#include "r_pcb.h"
+#include "./runtime/r_pcb.h"
 /*------------------------------------*/
-int	SELF(void);
-int	SELF()
+int	EOS_SELF(void);
+int	EOS_SELF()
 {
-	return(sys_pno);
+	return(knl_this_pno);
 }
 /*------------------------------------*/
-int	STATE(void);
-int	STATE()
+int	EOS_STATE(void);
+int	EOS_STATE()
 {
 	int ss;
-	ss=get_pcb_state(sys_pno);
+	ss=get_pcb_state(knl_this_pno);
 	return(ss);
 }
 /*------------------------------------*/
-void NEXT_STATE(int ss);
-void NEXT_STATE(int ss)
+void EOS_NEXT(int ss);
+void EOS_NEXT(int ss)
 {
-	set_pcb_state(sys_pno,ss);
+	set_pcb_state(knl_this_pno,ss);
 }
 /*================================================================*/
+extern int knl_this_msg;
+extern int knl_this_tim;
+#include "./message/r_msg.h"
+#include "./timer/r_tcb.h"
 /*------------------------------------*/
-int	EVENT(void);
-int	EVENT()
+#include "../user/eos_event.h"
+
+int	EOS_EVENT(void);
+int	EOS_EVENT()
 {
-	int node;
 	int event;
-	node=get_pcb_event(sys_pno);
-	event=get_msg_event(node);
-	return(event);
+	int pno,tno;
+	if(knl_this_msg!=0)
+	{
+		event=get_msg_event(knl_this_msg);
+		return(event);
+	}
+	if(knl_this_tim!=0)
+	{
+		pno=get_tcb_pno(knl_this_tim);
+		if(pno!=knl_this_pno)
+			return 0;
+		tno=get_tcb_tno(knl_this_tim);
+		tno += EOS_TIMER0_EVENT;
+		return(tno);
+	}
+	return 0;
 }
 /*------------------------------------*/
-int	LENGTH(void);
-int	LENGTH()
+int	EOS_LENGTH(void);
+int	EOS_LENGTH()
 {
-	int node;
 	int length;
-	node=get_pcb_event(sys_pno);
-	length=get_msg_length(node);
+	if(knl_this_msg==0)
+		return 0;
+
+	length=get_msg_length(knl_this_msg);
 	return(length);
 }
 /*------------------------------------*/
-int	SENDER(void);
-int	SENDER()
+int	EOS_SENDER(void);
+int	EOS_SENDER()
 {
-	int node;
 	int sour;
-	node=get_pcb_event(sys_pno);
-	sour=get_msg_sour(node);
+
+	if(knl_this_msg==0)
+		return 0;
+	sour=get_msg_sour(knl_this_msg);
 	return(sour);
 }
 
 /*------------------------------------*/
-void	ASEND(int dd,int ee,int ll,void *in);
-void	ASEND(int dd,int ee,int ll,void *in)
+void	EOS_ASEND(int dd,int ee,int ll,void *in);
+void	EOS_ASEND(int dd,int ee,int ll,void *in)
 {
 	int node;
-	node=get_idle_msg(sys_pno,ee,ll);
-	set_busy_msg(node,dd,in);
+	node=get_msg_idle(knl_this_pno,ee,ll);
+	set_msg_busy(node,dd,in);
 }
 /*================================================================*/
 /*------------------------------------*/
-#define TIMER_UNIT	((10*1000)/(EOS_SCH_CYCLE))
-void SET(int tno,int ll);
-void SET(int tno,int ll)
+void EOS_SET(int tno,int ll);
+void EOS_SET(int tno,int ll)
 {
 	int node;
-	node=get_node_tcb(tno,sys_pno);
-	set_pcb_timer(sys_pno,tno,node);
-	set_node_tcb(node,ll*TIMER_UNIT);
+	ll /= 10;
+	if(ll==0)
+		ll=1;
+	ll *= 10;
+
+	node=get_pcb_timer(knl_this_pno,tno);
+	if(node != 0)							//repeat set timer
+		reset_node_tcb(node);
+
+	node=get_node_tcb(tno,knl_this_pno);
+	set_pcb_timer(knl_this_pno,tno,node);
+	set_node_tcb(node,ll);
 }
 /*------------------------------------*/
-void KILL(int tno);
-void KILL(int tno)
+void EOS_KILL(int tno);
+void EOS_KILL(int tno)
 {
 	int node;
-	node=get_pcb_timer(sys_pno,tno);
+	node=get_pcb_timer(knl_this_pno,tno);
 	reset_node_tcb(node);
+	set_pcb_timer(knl_this_pno,tno,0);
 }
 
+/*------------------------------------*/
+void *eos_get_data(void);
+void *eos_get_data()
+{
+	void *data;
+	data=get_pcb_data(knl_this_pno);
+	return data;
+}
+
+void eos_set_data(void *data);
+void eos_set_data(void *data)
+{
+	set_pcb_data(knl_this_pno,data);
+}
+
+
+int eos_get_parent_pid(void);
+int eos_get_parent_pid()
+{
+	int	pid;
+	pid=get_pcb_parent(knl_this_pno);
+	return pid;
+}
 /*================================================================*/
 
 /* end of r_func.c */

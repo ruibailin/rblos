@@ -1,25 +1,30 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * process1.c
+ * Create:  2023-02-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
- *
+ * System process to create timer for all user process
  *
  *
  *
  *------------------------------------
  */
 
-
-
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
-/*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+#include "1imp.h"
 
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+#include "r_tcb.h"
+void	sys_timer(void *in);
+void	sys_timer(void *in)
+{
+	run_tcb_l10ms();
+	run_tcb_10ms();
+	run_tcb_100ms();
+	run_tcb_1s();
+}
+
+/*================================================================*/
+
+/* end of process1.c */

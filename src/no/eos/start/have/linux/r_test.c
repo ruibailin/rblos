@@ -22,6 +22,27 @@
 #include <time.h>
 #include <sys/time.h>
 
+extern	int		EOS_SELF(void);
+#define SELF EOS_SELF
+extern	int		EOS_STATE(void);
+#define STATE EOS_STATE
+extern	void	EOS_NEXT(int state);
+#define NEXT_STATE EOS_NEXT
+extern	int		EOS_EVENT(void);
+#define EVENT EOS_EVENT
+extern	int		EOS_LENGTH(void);
+#define LENGTH EOS_LENGTH
+extern	int		EOS_SENDER(void);
+#define SENDER EOS_SENDER
+extern	void	EOS_ASEND(int dest,int event,int len,void *in);
+#define ASEND EOS_ASEND
+extern	void	EOS_SET(int ptno,int len);
+extern  void eos_set_timer(int length);
+#define SET EOS_SET
+extern	void	EOS_KILL(int ptno);
+extern  void eos_reset_timer(void);
+#define KILL EOS_KILL
+
 /*------------------------------------*/
 void real_pro10(void *ptr);
 void real_pro10(void *ptr)
@@ -36,14 +57,14 @@ void real_pro10(void *ptr)
 	{
 	case 0:
 		ii=60;
-		SET(1,ii);
+		SET(1,ii*10);
 		printf(" proc %d set timer %d \n",pno,ii);
 		NEXT_STATE(1);
 		break;
 	case 1:
 		ii=60;
-		SET(1,ii);
-//		printf(" proc %d set timer %d \n",pno,ii);
+		SET(1,ii*10);
+		printf(" proc %d set timer %d \n",pno,ii);
 		ASEND(2,ii+10,0,(void *)0L);
 		break;
 	default:
@@ -86,10 +107,10 @@ void real_pro20(void *ptr)
 			ii=this_ms-last_ms;
 		else
 			ii=1000-last_ms+this_ms;
-//		if(ii>604)
-//			printf(" wrong %d \n",ii);
-//		else
-//			printf(" proc %d event %d,timer interval %d\n",pno,ee,ii);
+		if(ii>604)
+			printf(" wrong %d \n",ii);
+		else
+			printf(" proc %d event %d,timer interval %d\n",pno,ee,ii);
 		last_ms=this_ms;
 	}
 }
@@ -106,7 +127,7 @@ void  watch_dog(void *ptr)
   struct tm *p;
 
   xx=STATE();
-  SET(1,100);
+  SET(1,1000);
   if(xx==0)
   {
 	  time(&timep);
@@ -129,7 +150,7 @@ void  watch_dog(void *ptr)
 
 }
 /*------------------------------------*/
-#include "../../../kernel/r_pat.h"
+#include "../../../kernel/process/basic/r_pat.h"
 void	ini_def_proc(void);
 void	ini_def_proc()
 {

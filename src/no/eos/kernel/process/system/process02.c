@@ -1,25 +1,27 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * process02.c
+ * Create:  2023-02-19
  * Author:  Steve Rui
  *------------------------------------
  * Record:
- *
+ * System Idle Process to calculate CPU Ocuprency rate and defrage memory
  *
  *
  *
  *------------------------------------
  */
 
-
-
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
-/*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+#include "1imp.h"
 
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+extern void soc_clr_wdt(void);
+void	sys_idler(void *in);
+void	sys_idler(void *in)
+{
+	soc_clr_wdt();
+}
+
+/*================================================================*/
+
+/* end of system2.c */

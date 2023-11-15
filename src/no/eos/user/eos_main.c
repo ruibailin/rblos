@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * eos_main.c
+ * Create:  2023-02-18
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,13 +13,19 @@
  */
 
 
-
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
 /*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+extern void knl_ini_all(void);
+extern void knl_run_all(void);
+void	eos_main(void);
+void	eos_main()
+{
+	knl_ini_all();
+	for(;;)
+	{
+		knl_run_all();
+	}
+}
 
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+
+/* end of eos_main.c */

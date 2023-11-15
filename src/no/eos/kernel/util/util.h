@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * util.h
+ * Create:  2023-02-17
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -12,14 +12,14 @@
  *------------------------------------
  */
 
-
-
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
-/*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+#ifndef SRC_KERNEL_UTIL_UTIL_H_
+#define SRC_KERNEL_UTIL_UTIL_H_
 
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+extern	void	knl_panic(void);
+extern	void	knl_print(const char *fmt, ...);
+
+/*================================================================*/
+
+#endif 
+/* end of util.h */

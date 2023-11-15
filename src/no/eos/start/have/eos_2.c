@@ -19,8 +19,7 @@
 #include "r_time.h"
 #include "r_sleep.h"
 #include "r_delay.h"
-
-extern	void eos_time(void);
+#define EOS_SCH_CYCLE 1000
 static long int last_us=0;
 static long int this_us=0;
 int cal_cpu_rate(void);
@@ -34,7 +33,6 @@ int cal_cpu_rate()
 	if(busy>EOS_SCH_CYCLE)
 	{
 		os_printf("Too Busy! %d\n",busy);
-		eos_time();
 		last_us=os_get_us();
 		return 100;
 	}
@@ -44,7 +42,7 @@ int cal_cpu_rate()
 //	os_sleep_us(idle);
 	os_delay_us(idle*10);
 	last_us=os_get_us();
-	eos_time();
+//	eos_time();
 	return((int)rate);
 }
 

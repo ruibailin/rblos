@@ -1,17 +1,17 @@
 /*
- * eos.h
+ * 1imp.h
  *
  *  Created on: May 19, 2023
  *      Author: stever
  */
 
-#ifndef SRC_EOS_H_
-#define SRC_EOS_H_
+#ifndef SRC_EOS_KERNEL_INTERRUPT_1IMP_H_
+#define SRC_EOS_KERNEL_INTERRUPT_1IMP_H_
+#include "../0ctr.h"
 /*================================================================*/
-#include "./user/eos_api.h"
+#define MAX_IR_NUM	12
 /*------------------------------------*/
-#include "./user/eos_timer.h"
-#include "./user/eos_event.h"
-#include "./user/eos_state.h"
+
+
 /*================================================================*/
-#endif /* SRC_EOS_H_ */
+#endif /* SRC_EOS_KERNEL_INTERRUPT_1IMP_H_ */

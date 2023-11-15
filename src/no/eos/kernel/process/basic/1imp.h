@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * 1imp.h
+ * Create:  2023-02-17
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -12,14 +12,19 @@
  *------------------------------------
  */
 
+#ifndef KERNEL_PROC_BASIC_1IMP_H_
+#define KERNEL_PROC_BASIC_1IMP_H_
 
-
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
+#include "../1imp.h"
 /*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+#define	DUM			0x00
+#define IDLE		0x01
+#define SLOT		0x02
+#define MSG			0x03
+#define TIME		0x04
+#define REAL		0x05
 
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+
+#endif 
+/* end of 1imp.h */

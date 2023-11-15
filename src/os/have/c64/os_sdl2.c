@@ -14,6 +14,7 @@
 
 #include "0ctr.h"
 #if	_OS_HAVE_C64_
+#if _OS_HAVE_SDL2_
 /*================================================================*/
 #include <SDL2/SDL.h>
 #include "os_type.h"
@@ -352,5 +353,6 @@ void os_sdl2_unlock_mutex(void *sc)
     SDL_UnlockMutex(mutex);
 }
 /*================================================================*/
+#endif
 #endif
 /* end of os_sdl2.c */

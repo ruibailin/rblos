@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * rbl_rand.c
+ * Create:  2023-02-21
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -12,14 +12,27 @@
  *------------------------------------
  */
 
-
-
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
-/*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+#include "1imp.h"
 
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+#include <stdlib.h>
+static int flag=0;
+int rbl_get_rand(void);
+int rbl_get_rand()
+{
+	int i;
+
+	/* Intializes random number generator */
+	if(flag==0)
+	{
+		srand(200);
+		flag=1;
+	}
+
+	i = rand();
+	return i;
+}
+
+/*================================================================*/
+
+/* end of rbl_rand.c */

@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * head.h
+ * Create:  2023-05-18
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -13,13 +13,16 @@
  */
 
 
-
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
+#include "1imp.h"
+#ifndef SRC_EOS_KERNEL_PROCESS_GROUP_HEAD_H_
+#define SRC_EOS_KERNEL_PROCESS_GROUP_HEAD_H_
 /*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+
+extern void	grp_ini_head(void);
+extern int grp_get_head(int grp);
+extern void grp_set_head(int grp,int pno);
 
 /*================================================================*/
 #endif
-/* end of 0ctr.h */
+
+/* end of head.h */

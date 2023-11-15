@@ -1,7 +1,7 @@
 
 /*------------------------------------
- * 0ctr.h
- * Create:  2021-10-19
+ * panic.c
+ * Create:  2023-02-17
  * Author:  Steve Rui
  *------------------------------------
  * Record:
@@ -14,12 +14,16 @@
 
 
 
-#ifndef EOS_START_0CTR_H_
-#define EOS_START_0CTR_H_
 /*================================================================*/
-#define EOS_WITH_OS		1			//operating system
-#define EOS_WITH_BM		0			//bare mental
+void	knl_panic(void);
+void	knl_panic()
+{
+	do
+	{
+
+	}while(1);
+}
 
 /*================================================================*/
-#endif
-/* end of 0ctr.h */
+
+/* end of panic.c */
