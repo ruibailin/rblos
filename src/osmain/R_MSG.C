@@ -1,145 +1,298 @@
-#include  "rbltype.h"
-#include  "r_mem.h"
-#include  "r_msg.h"
 
-static C_QUEUE   SelfMsgBuf;
+#define		MAX_MSG_NUM		256
+#define		MSG_LIST_NUM	2
+#define		MAX_NODE_NUM	MAX_MSG_NUM+MSG_LIST_NUM
 /*------------------------------------*/
-void  ini_self_msg(void);
-void  ini_self_msg(void)
-{
-  SelfMsgBuf.Head=0;
-  SelfMsgBuf.Tail=0;
-  SelfMsgBuf.Ptr=(WFAR *)alloc_ram(MAX_MSG_NUM*sizeof(WORD));
-  SelfMsgBuf.Pool=(BFAR *)alloc_ram(MAX_POOL_LEN);
- }
+/*define Node used in list*/
+typedef struct{
+	int		last;
+	int		next;
+	int		root;
+} Node;
+typedef struct{
+	int   dest;
+	int   sour;
+	int   event;
+	int	  length;
+	void  *body;
+}MSG;
 
 /*------------------------------------*/
+#define   EventIdleQueue    0
+#define	  EventBusyQueue	1
+static	MSG	 MSGPool[MAX_NODE_NUM];
+static	Node NodePool[MAX_NODE_NUM];
 
-WFAR is_new_msg(void);
-WFAR is_new_msg(void)
+/*------------------------------------*/
+/*Make a Node Is a Root In Queue */
+static	void  QueueNode(int item);
+static	void  QueueNode(int item)
 {
-	if(SelfMsgBuf.Head==SelfMsgBuf.Tail) return 0;
-	else return 1;
+  Node   *itemptr;
+
+  itemptr =&(NodePool[item]);
+  itemptr->next=item;
+  itemptr->last=item;
+  itemptr->root=item;
+
 }
 
-
-
 /*------------------------------------*/
-BFAR *get_self_msg(void);
-BFAR *get_self_msg()
+/*Put a Node after one Node*/
+static	void  AppendNode(int last,int item);
+static	void  AppendNode(int last,int item)
 {
-  WORD  offset;
-  BFAR *ptr;
-  cli_int();
-  offset=SelfMsgBuf.Ptr[SelfMsgBuf.Tail];
-  ptr=SelfMsgBuf.Pool+offset;
-  sti_int();
+  int  next,root;
+  Node   *lastptr;
+  Node   *itemptr;
+  Node   *nextptr;
+  lastptr =&(NodePool[last]);
+  root=lastptr->root;
+  next=lastptr->next;
+  lastptr->next=item;
 
-  return((BFAR *)ptr);
+  itemptr =&(NodePool[item]);
+  itemptr->next=next;
+  itemptr->last=last;
+  itemptr->root=root;
+
+  nextptr =&(NodePool[next]);
+  nextptr->last=item;
 }
 /*------------------------------------*/
-void  free_self_msg(void);
-void  free_self_msg()
+/*Put a Node Befor one Node*/
+static	void  BeforeNode(int next,int item);
+static	void  BeforeNode(int next,int item)
 {
-  cli_int();
-  SelfMsgBuf.Tail++;
-  if(SelfMsgBuf.Tail==MAX_MSG_NUM)
-  SelfMsgBuf.Tail=0;
-  sti_int();
+  int  last,root;
+  Node   *nextptr;
+  Node   *itemptr;
+  Node   *lastptr;
+
+  nextptr =&(NodePool[next]);
+  root=nextptr->root;
+  last=nextptr->last;
+  nextptr->last=item;
+
+  itemptr =&(NodePool[item]);
+  itemptr->next=next;
+  itemptr->last=last;
+  itemptr->root=root;
+
+  lastptr =&(NodePool[last]);
+  lastptr->next=item;
 
 }
 /*------------------------------------*/
-static BFAR *req_self_buf(WORD len);
-static BFAR *req_self_buf(WORD len)
+/*Delete a Node From Queue */
+static	void  DeleteNode(int item);
+static	void  DeleteNode(int item)
 {
-  WORD  ii;
-  WORD  HeadMsgPtr,TailMsgPtr;
-  BFAR *ptr;
-  ptr=SelfMsgBuf.Pool;
+  int last,next;
+  Node   *itemptr;
+  Node   *lastptr;
+  Node   *nextptr;
 
-  ii=SelfMsgBuf.Head;
-  ii++;
-  if(ii==MAX_MSG_NUM)  ii=0;
-  if(ii==SelfMsgBuf.Tail)
-  return((VFAR *)0);                              /*No more Ptr*/
+  itemptr =&(NodePool[item]);
+  next=itemptr->next;
+  if(next == item)	 return;
+  last=itemptr->last;
+  itemptr->last=item;
+  next=itemptr->next;
+  itemptr->next=item;
+  itemptr->root=item;
 
-  HeadMsgPtr=SelfMsgBuf.Ptr[SelfMsgBuf.Head];  /*Point to Useable Buffer */
-  TailMsgPtr=SelfMsgBuf.Ptr[SelfMsgBuf.Tail];  /*Point to Unuseable Buffer */
+  lastptr =&(NodePool[last]);
+  lastptr->next=next;
 
-  if(HeadMsgPtr<TailMsgPtr)
+  nextptr =&(NodePool[next]);
+  nextptr->last=last;
+
+}
+/*------------------------------------*/
+/*Find a Node In A Queue */
+static	int  LocateNode(int root,int item);
+static	int  LocateNode(int root,int item)
+{
+  int next;
+  next=NodePool[root].next;
+  for(;;)
   {
-    ii=TailMsgPtr-HeadMsgPtr;
-    if(ii>len)
-    goto  FindUB;
-    return((VFAR *)0);
+    if(next == root)	return(root);	/*no find*/
+	if(next == item)	return(item);	/*find the node*/
+    next=NodePool[next].next;
   }
-  else                          /* HeadMsgPtr>=TailMsgPtr */
-  {
-    ii=MAX_POOL_LEN-HeadMsgPtr;
-    if(ii>len)
-    goto FindUB;
-    if(TailMsgPtr>len)
-    {
-      HeadMsgPtr=0;                /*Current Useable Offset become to be 0*/
-      SelfMsgBuf.Ptr[SelfMsgBuf.Head]=0;
-      goto FindUB;
-    }
-    return((VFAR *)0);
-  }
+}
 
-FindUB:
-  ptr += HeadMsgPtr;
-  HeadMsgPtr += len;
-  SelfMsgBuf.Head++;
-  if(SelfMsgBuf.Head==MAX_MSG_NUM)
-  SelfMsgBuf.Head=0;
-  SelfMsgBuf.Ptr[SelfMsgBuf.Head]=HeadMsgPtr; /*Next Useable Buffer */
-  return((BFAR *)ptr);
+
+/*------------------------------------*/
+/*Browse a Node In Queue */
+static	int  BrowseNode(int root);
+static	int  BrowseNode(int root)
+{
+  int next,size;
+  size=0;
+  next=NodePool[root].next;
+  for(;;)
+  {
+    if(next == root) break;
+    next=NodePool[next].next;
+	size++;
+  }
+  return(size);
+}
+
+/*------------------------------------*/
+/*initiate all node for future use */
+static	void  ini_all_node(void);
+static	void  ini_all_node(void)
+{
+  int ii;
+  for(ii=0;ii<MAX_NODE_NUM;ii++)
+  {
+	QueueNode(ii);
+  }
+}
+
+/*------------------------------------*/
+#define  get_node_next(node)	NodePool[(node)].next
+#define  get_node_last(node)	NodePool[(node)].last
+#define  get_node_root(node)	NodePool[(node)].root
+
+
+/**********************MSG***************************************/
+/*------------------------------------*/
+static void ini_idle_list(int start);
+static void ini_idle_list(int start)
+{
+	int ii;
+	for(ii=start;ii<MAX_NODE_NUM;ii++)
+	{
+		BeforeNode(EventIdleQueue,ii);
+	}
 }
 
 /*===========================================================================*/
+/*------------------------------------*/
+void ini_msg_list(void);
+void ini_msg_list()
+{
+	ini_all_node();
+	ini_idle_list(MSG_LIST_NUM);
+}
+/*------------------------------------*/
+int get_idle_msg(int s,int eve,int len);
+int get_idle_msg(int s,int eve,int len)
+{
+	int node;		/*for common list*/
+	int node_msg;	/*for MSG list*/
+	node=get_node_next(EventIdleQueue);
+	DeleteNode(node);
+	node_msg=node;
+	MSGPool[node_msg].sour=s;
+	MSGPool[node_msg].event=eve;
+	MSGPool[node_msg].length=len;
+	return(node);
+}
 
 /*------------------------------------*/
-WORD SendToSelf(WORD event,BFAR *out,WORD len,WORD dest,WORD sour);
-WORD SendToSelf(WORD event,BFAR *out,WORD len,WORD dest,WORD sour)
+void set_busy_msg(int node,int d,void *out);
+void set_busy_msg(int node,int d,void *out)
 {
-  BFAR *HeadPtr;
-  WORD ii;
-  cli_int();
-  HeadPtr=req_self_buf(sizeof(MSG)+len);
-  sti_int();
-  if(HeadPtr==(VFAR *)0)
-  return(0);
+	int	root;
+	int node_msg;	/*for MSG list*/
+	node_msg=node;
+	MSGPool[node_msg].dest=d;
+	MSGPool[node_msg].body=out;
+	root=EventBusyQueue;
+	BeforeNode(root,node);
+}
 
-  ((MSG FAR *)HeadPtr)->dest.pno=dest;
-  ((MSG FAR *)HeadPtr)->dest.unit=0;
-  ((MSG FAR *)HeadPtr)->dest.module =0;
-  ((MSG FAR *)HeadPtr)->sour.pno=sour;
-  ((MSG FAR *)HeadPtr)->sour.unit=0;
-  ((MSG FAR *)HeadPtr)->sour.module=0;
-  ((MSG FAR *)HeadPtr)->event=event;
-  ((MSG FAR *)HeadPtr)->leng=len;
-  HeadPtr += sizeof(MSG);
-  for(ii=0;ii<len;ii++)
-  {
-  	(BFAR)HeadPtr[ii]=(BFAR)out[ii];
-  }
-  send_ret();
-  return(1);
-}
-/*===========================================================================*/
-WORD MSEND(WORD event,BFAR *out,WORD len,PID *dest);
-WORD MSEND(WORD event,BFAR *out,WORD len,PID *dest)
+/*------------------------------------*/
+int	get_msg_arrived(void);
+int get_msg_arrived()
 {
-	PID	self;
-	SELF(&self);
-	return(SendToSelf(event,out,len,dest->pno,self.pno));
+  int root,next;
+  root=EventBusyQueue;
+  next=get_node_next(root);
+  if(next == root)	return(EventIdleQueue);
+  DeleteNode(next);
+  return(next);
 }
-WORD ASEND(WORD event,BFAR *out,WORD len,PID *dest);
-WORD ASEND(WORD event,BFAR *out,WORD len,PID *dest)
+/*------------------------------------*/
+void free_msg_arrived(int node);
+void free_msg_arrived(int node)
 {
-	PID	self;
-	SELF(&self);
-	return(SendToSelf(event,out,len,dest->pno,self.pno));
+  int root;
+  root=EventIdleQueue;
+  BeforeNode(root,node);     /*Add node to Idle Queue*/
 }
-/*End Of mmem.c*/
+/*------------------------------------*/
+int	get_msg_dest(int node);
+int get_msg_dest(int node)
+{
+  int dest;
+  dest=MSGPool[node].dest;
+  return(dest);
+}
+/*------------------------------------*/
+int	get_msg_sour(int node);
+int get_msg_sour(int node)
+{
+  int sour;
+  sour=MSGPool[node].sour;
+  return(sour);
+}
+/*------------------------------------*/
+int	get_msg_event(int node);
+int get_msg_event(int node)
+{
+  int event;
+  event=MSGPool[node].event;
+  return(event);
+}
+
+/*------------------------------------*/
+int	get_msg_length(int node);
+int get_msg_length(int node)
+{
+  int length;
+  length=MSGPool[node].length;
+  return(length);
+}
+/*------------------------------------*/
+void	*get_msg_body(int node);
+void	*get_msg_body(int node)
+{
+  void *body;
+  body=MSGPool[node].body;
+  return(body);
+}
+/*--------used in N threaad-----------*/
+#include	"r_pat.h"
+void ini_pcb_msg(void);
+void ini_pcb_msg(void)
+{
+	ini_all_node();
+	ini_idle_list(PAT_LIST_NUM+MAX_PAT_NUM);
+}
+/*------------------------------------*/
+void set_pcb_msg(int node,int d,void *out);
+void set_pcb_msg(int node,int d,void *out)
+{
+	MSGPool[node].dest=d;
+	MSGPool[node].body=out;
+	BeforeNode(d,node);
+}
+/*------------------------------------*/
+int	get_pcb_msg(int pcb);
+int get_pcb_msg(int pcb)
+{
+  int root,next;
+  root=pcb;
+  next=get_node_next(root);
+  if(next == root)	return(EventIdleQueue);
+  DeleteNode(next);
+  return(next);
+}
+/*The End of r_msg.c */

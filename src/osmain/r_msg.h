@@ -1,37 +1,21 @@
 #ifndef _r_msg_h
 #define _r_msg_h
-#include "rbltype.h"
-
-
-typedef  struct{
-  WORD   Head;
-  WORD   Tail;
-  WFAR 	*Ptr;
-  BFAR 	*Pool;
-}C_QUEUE;
-
-typedef struct{
-  PID   dest;
-  PID   sour;
-  WORD  event;
-  WORD  leng;
-}MSG;
-
-
-#define   MAX_MSG_NUM     256
-#define   MAX_POOL_LEN    MAX_MSG_NUM*(sizeof(MSG)+6)
-
 /*------------------------------------*/
-extern  VFAR  ini_self_msg(void);
-extern  WFAR is_new_msg(void);
-extern  BFAR *get_self_msg(void);
-extern  VFAR free_self_msg(void);
-
-extern  WORD  SendToSelf(WORD event,BFAR *out,WORD len,WORD d_pno,WORD s_pno);
-/*------------------------------------*/
-extern void SELF(PID FAR *self);
-
+extern	void	ini_msg_list(void);
+extern	int		get_idle_msg(int s,int eve,int len);
+extern	void	set_busy_msg(int node,int d,void *out);
+extern	int		get_msg_arrived(void);
+extern	void	free_msg_arrived(int node);
+extern	int		get_msg_dest(int node);
+extern	int		get_msg_sour(int node);
+extern	int		get_msg_event(int node);
+extern	int		get_msg_length(int node);
+extern	void	*get_msg_body(int node);
+extern	void 	ini_pcb_msg(void);
+extern	void 	set_pcb_msg(int node,int d,void *out);
+extern	int		get_pcb_msg(int pcb);
 #endif
+
 /*End Of r_msg.h*/
 
 
