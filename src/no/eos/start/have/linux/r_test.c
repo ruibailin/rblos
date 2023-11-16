@@ -43,12 +43,20 @@ extern	void	EOS_KILL(int ptno);
 extern  void eos_reset_timer(void);
 #define KILL EOS_KILL
 
+extern void app_clt_init_skt(void);
+extern void app_clt_free_skt(void);
+extern int app_clt_send_skt(char *frm,int size);
+extern int app_clt_recv_skt(char *frm,int size);
+
+static char ac[]={0x41,0x43,0xF1,0x80,0x00,0x00,0x01,0x01,0x01,0x00,0x00,0xE9,0x5D,0x00};
+static char rec[480];
 /*------------------------------------*/
 void real_pro10(void *ptr);
 void real_pro10(void *ptr)
 {
 	int ii;
-	int  ss,ee,pno;
+	int ss,ee,pno;
+	int ret;
 	ss=STATE();
 	pno=SELF();
 	ee=EVENT();
@@ -59,13 +67,19 @@ void real_pro10(void *ptr)
 		ii=60;
 		SET(1,ii*10);
 		printf(" proc %d set timer %d \n",pno,ii);
+		app_clt_init_skt();
 		NEXT_STATE(1);
 		break;
 	case 1:
 		ii=60;
 		SET(1,ii*10);
-		printf(" proc %d set timer %d \n",pno,ii);
-		ASEND(2,ii+10,0,(void *)0L);
+//		printf(" proc %d set timer %d \n",pno,ii);
+		ret=app_clt_send_skt(ac,13);
+		if(ret!=13)
+			printf(" Wrong send \r\n");
+		ret=app_clt_recv_skt(rec,40);
+		printf(" Recv %d \r\n",ret);
+		ASEND(20,ii+10,0,(void *)0L);
 		break;
 	default:
 		break;
