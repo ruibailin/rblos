@@ -19,22 +19,26 @@
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #include "1imp.h"
-#define os_print(x...)  	printf(x);
 /**************************************************/
 static int app_skt_fd;
-static void clt_create_skt(void);
-static void clt_create_skt(void)
+static void clt_create_skt(int type);
+static void clt_create_skt(int type)
 {
-    app_skt_fd = socket(AF_INET, SOCK_DGRAM, 0);
+	app_skt_fd = -1;
+	if(type==1)		//TCP
+		app_skt_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if(type==2)		//UDP
+	    app_skt_fd = socket(AF_INET, SOCK_DGRAM, 0);
     if(app_skt_fd>=0)
     	return;
 	os_print("Client create socket error: %s(errno: %d)\n", strerror(errno),errno);
 }
 /**************************************************/
 static struct sockaddr_in svr_skt_addr;
-static const char *svr_ip_addr="192.168.137.200";
+static const char *svr_ip_addr="10.0.5.108";
 static void clt_bind_skt(void);
 static void clt_bind_skt(void)
 {
@@ -82,10 +86,10 @@ static void clt_distroy_skt(void)
    	app_skt_fd=-1;
 }
 /**************************************************/
-void app_clt_init_skt(void);
-void app_clt_init_skt(void)
+void app_clt_init_skt(int type);
+void app_clt_init_skt(int type)
 {
-    clt_create_skt();
+    clt_create_skt(type);
     clt_bind_skt();
 
 	clt_connect_skt();
