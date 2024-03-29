@@ -18,5 +18,7 @@ extern void app_svr_init_skt(int type);		//type=1:TCP;type=2:UDP
 extern void app_svr_free_skt(void);
 extern int app_svr_recv_skt(char *frm,int size);
 extern int app_svr_send_skt(char *frm,int size);
+extern void app_svr_set_nonblock(void);
+extern void app_svr_set_block(void);
 #endif 
 /* end of svr.h */

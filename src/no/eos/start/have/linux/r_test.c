@@ -47,42 +47,8 @@ extern void app_clt_init_skt(int type);
 extern void app_clt_free_skt(void);
 extern int app_clt_send_skt(char *frm,int size);
 extern int app_clt_recv_skt(char *frm,int size);
-
-#define aci_print(x...)  	printf(x)
-void Log_Hex_Data(char *data, int size)
-{
-	int i,j;
-	char cc;
-	aci_print("\r\n|-------------------------------------------------|\r\n");
-
-	for(i=0; i<size; ++i)
-	{
-		if((i & 0x0F) == 0)
-		{
-			aci_print("| ");
-		}
-		cc=data[i];
-		j=(int)cc;
-		j &= 0x000000FF;
-		aci_print("%02X ", j);
-
-		if((i & 0x0F) == 0x0F)
-		{
-			aci_print("|\r\n");
-		}
-	}
-
-	while((i & 0x0F) != 0x00)
-	{
-		aci_print("   ");
-		if((i++ & 0x0F) == 0x0F)
-		{
-			aci_print("|\r\n");
-		}
-	}
-	aci_print("|-------------------------------------------------|\r\n");
-}
-
+extern void skt_log_packet(char *data, int size);
+extern void app_clt_set_nonblock(void);
 
 static char ac_f1[]={0x41,0x43,0xF1,0x80,0x00,0x00,0x01,0x01,0x01,0x00,0x00,0xE9,0x5D,0x00};
 static char ac_cc[]={0x41,0x43,0xCC,0x00,0x66,0x51,0x01,0x01,0x04,0x00,0x04,0x00,0x02,0x00,0x70,0x87,0x00};
@@ -110,13 +76,22 @@ void real_pro10(void *ptr)
 	case 1:
 		ii=60;
 		SET(1,ii*10);
-//		printf(" proc %d set timer %d \n",pno,ii);
+		printf(" proc %d set timer %d \n",pno,ii);
 		ret=app_clt_send_skt(ac_cc,16);
 		if(ret!=16)
 			printf(" Wrong send \r\n");
+		app_clt_set_nonblock();
+		NEXT_STATE(2);
+		break;
+	case 2:
+		ii=60;
+		SET(1,ii*10);
 		ret=app_clt_recv_skt(rec,480);
-		printf(" Recv %d \r\n",ret);
-		Log_Hex_Data(rec,ret);
+		if(ret>0)
+		{
+			printf(" Recv %d \r\n",ret);
+			skt_log_packet(rec,ret);
+		}
 		ASEND(20,ii+10,0,(void *)0L);
 		break;
 	default:

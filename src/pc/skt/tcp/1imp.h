@@ -12,16 +12,14 @@
  *---------------------------
  */
 
-#ifndef PC_SKT_1IMP_H_
-#define PC_SKT_1IMP_H_
+#ifndef PC_SKT_TCP_1IMP_H_
+#define PC_SKT_TCP_1IMP_H_
 
 /**************************************************/
 #include <stdio.h>
-#include "./tcp/clt.h"
-#include "./tcp/svr.h"
-#include "./udp/clt.h"
-#include "./udp/svr.h"
+#define APP_SKT_PORT	37002
 #define os_print(x...)  	printf(x);
+extern void skt_log_packet(char *data, int size);
 /**************************************************/
 #endif 
 /* end of 1imp.h */
