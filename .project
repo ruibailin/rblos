@@ -23,4 +23,21 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/no/eos</name>
+			<type>2</type>
+			<location>G:/Nanjing/eos/src/eos</location>
+		</link>
+		<link>
+			<name>src/no/test</name>
+			<type>2</type>
+			<location>G:/Nanjing/eos/src/test</location>
+		</link>
+		<link>
+			<name>src/os/rbl</name>
+			<type>2</type>
+			<location>G:/Nanjing/rbl/src/rbl</location>
+		</link>
+	</linkedResources>
 </projectDescription>
