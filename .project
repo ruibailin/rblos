@@ -25,19 +25,19 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src/no/eos</name>
+			<name>src/no/3eos</name>
 			<type>2</type>
-			<location>G:/Nanjing/eos/src/eos</location>
+			<location>G:/Nanjing/3eos/src/3eos</location>
 		</link>
 		<link>
 			<name>src/no/test</name>
 			<type>2</type>
-			<location>G:/Nanjing/eos/src/test</location>
+			<location>G:/Nanjing/3eos/src/test</location>
 		</link>
 		<link>
-			<name>src/os/rbl</name>
+			<name>src/os/4rbl</name>
 			<type>2</type>
-			<location>G:/Nanjing/rbl/src/rbl</location>
+			<location>G:/Nanjing/4rbl/src/4rbl</location>
 		</link>
 	</linkedResources>
 </projectDescription>
