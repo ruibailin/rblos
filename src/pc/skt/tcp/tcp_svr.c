@@ -93,12 +93,14 @@ static int svr_listen_skt(int skt_fd,int port)
 	return -1;
 }
 /**************************************************/
-static int svr_connect_skt(int skt_fd,struct sockaddr *addr);
-static int svr_connect_skt(int skt_fd,struct sockaddr *addr)
+static int svr_connect_skt(int skt_fd,void *clt_info);
+static int svr_connect_skt(int skt_fd,void *clt_info)
 {
 	if(skt_fd == -1)
 		return -1;
 
+	struct sockaddr *addr;
+	addr = (struct sockaddr *)clt_info;
 	int cnct_fd;
 	socklen_t length;
 	length=sizeof(struct sockaddr);
@@ -157,10 +159,12 @@ int rbl_tcp_svr_init_skt(int port)
    	return skt_fd;
 }
 
-int rbl_tcp_svr_conn_skt(int skt_fd,struct sockaddr *addr);
-int rbl_tcp_svr_conn_skt(int skt_fd,struct sockaddr *addr)
+int rbl_tcp_svr_conn_skt(int skt_fd,void *clt_info);
+int rbl_tcp_svr_conn_skt(int skt_fd,void *clt_info)
 {
 	int cnct_fd;
+	struct sockaddr *addr;
+	addr = (struct sockaddr *)clt_info;
    	cnct_fd = svr_connect_skt(skt_fd,addr);
    	return cnct_fd;
 }
