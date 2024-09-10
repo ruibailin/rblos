@@ -18,8 +18,8 @@
 /**************************************************/
 #include <stdio.h>
 #define APP_SKT_PORT	37002
-#define os_print(x...)  	printf(x);
-extern void skt_log_packet(char *data, int size);
+#define rbl_print(x...)  	printf(x);
+extern void rbl_log_packet(char *data, int size);
 /**************************************************/
 #endif 
 /* end of 1imp.h */

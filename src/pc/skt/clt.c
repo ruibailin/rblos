@@ -23,107 +23,96 @@
 
 #include "1imp.h"
 /**************************************************/
-static int app_type;
+//static int type;
 /**************************************************/
-void app_clt_init_skt(int type);
-void app_clt_init_skt(int type)
+int rbl_clt_init_skt(int type,char *ip,int port);
+int rbl_clt_init_skt(int type,char *ip,int port)
 {
-	app_type=type;
-	if(app_type==1)
+	int fd;
+	fd = -1;
+	if(type==1)
 	{
-	    tcp_clt_init_skt();
+	    fd = rbl_tcp_clt_init_skt(ip,port);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-	    udp_clt_init_skt();
+	    fd = rbl_udp_clt_init_skt(ip,port);
 	}
-
+	return fd;
 }
 /**************************************************/
-void app_clt_free_skt(void);
-void app_clt_free_skt(void)
+void rbl_clt_free_skt(int type,int skt_fd);
+void rbl_clt_free_skt(int type,int skt_fd)
 {
-	if(app_type==1)
+	if(type==1)
 	{
-		tcp_clt_free_skt();
+		rbl_tcp_clt_free_skt(skt_fd);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		udp_clt_free_skt();
+		rbl_udp_clt_free_skt(skt_fd);
 	}
 }
 
 /**************************************************/
-int app_clt_send_skt(char *buf,int size);
-int app_clt_send_skt(char *buf,int size)
+int rbl_clt_send_skt(int type,int skt_fd,char *buf,int size);
+int rbl_clt_send_skt(int type,int skt_fd,char *buf,int size)
 {
 	int sen_len;
-	if(app_type==1)
+	sen_len = 0;
+	if(type==1)
 	{
-		sen_len=tcp_clt_send_skt(buf,size);
+		sen_len=rbl_tcp_clt_send_skt(skt_fd,buf,size);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		sen_len=udp_clt_send_skt(buf,size);
+		sen_len=rbl_udp_clt_send_skt(skt_fd,buf,size);
 	}
    	return sen_len;
 }
 /**************************************************/
-int app_clt_recv_skt(char *buf,int size);
-int app_clt_recv_skt(char *buf,int size)
+int rbl_clt_recv_skt(int type,int skt_fd,char *buf,int size);
+int rbl_clt_recv_skt(int type,int skt_fd,char *buf,int size)
 {
     int rec_len;
-	if(app_type==1)
+    rec_len = 0;
+	if(type==1)
 	{
-		rec_len=tcp_clt_recv_skt(buf,size);
+		rec_len=rbl_tcp_clt_recv_skt(skt_fd,buf,size);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		rec_len=udp_clt_recv_skt(buf,size);
+		rec_len=rbl_udp_clt_recv_skt(skt_fd,buf,size);
 	}
    	return rec_len;
 }
 
-/**************************************************/
-int app_clt_init_add(char *ip_addr);
-int app_clt_init_add(char *ip_addr)
-{
-    int i;
-	if(app_type==1)
-	{
-		i=tcp_clt_init_add(ip_addr);
-	}
-	if(app_type==2)
-	{
-		i=udp_clt_init_add(ip_addr);
-	}
-    return i;
-}
+
 /**************************************************/
 #include <fcntl.h>
-void app_clt_set_nonblock(void);
-void app_clt_set_nonblock()
+void rbl_clt_set_nonblock(int type,int skt_fd);
+void rbl_clt_set_nonblock(int type,int skt_fd)
 {
-	if(app_type==1)
+	if(type==1)
 	{
-		tcp_clt_set_nonblock();
+		rbl_tcp_clt_set_nonblock(skt_fd);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		udp_clt_set_nonblock();
+		rbl_udp_clt_set_nonblock(skt_fd);
 	}
 }
 
-void app_clt_set_block(void);
-void app_clt_set_block()
+void rbl_clt_set_block(int type,int skt_fd);
+void rbl_clt_set_block(int type,int skt_fd)
 {
-	if(app_type==1)
+	if(type==1)
 	{
-		tcp_clt_set_block();
+		rbl_tcp_clt_set_block(skt_fd);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		udp_clt_set_block();
+		rbl_udp_clt_set_block(skt_fd);
 	}
 }
 /* end of clt.c */

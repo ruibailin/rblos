@@ -5,12 +5,12 @@
  *      Author: stever
  */
 
-#ifndef SRC_PC_SKT_LOG_H_
-#define SRC_PC_SKT_LOG_H_
+#ifndef SRC_PC_rbl_log_H_
+#define SRC_PC_rbl_log_H_
 /*================================================================*/
-extern void skt_log_packet(char *data, int size);
+extern void rbl_log_packet(char *data, int size);
 /*------------------------------------*/
-extern void skt_log_hex(char data);
-extern void skt_log_ascii(char data);
+extern void rbl_log_hex(char data);
+extern void rbl_log_ascii(char data);
 /*================================================================*/
-#endif /* SRC_PC_SKT_LOG_H_ */
+#endif /* SRC_PC_rbl_log_H_ */

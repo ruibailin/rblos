@@ -17,11 +17,11 @@
 
 /**************************************************/
 #include <stdio.h>
-#include "./tcp/clt.h"
-#include "./tcp/svr.h"
-#include "./udp/clt.h"
-#include "./udp/svr.h"
-#define os_print(x...)  	printf(x);
+#include "./tcp/tcp_clt.h"
+#include "./tcp/tcp_svr.h"
+#include "./udp/udp_clt.h"
+#include "./udp/udp_svr.h"
+#define rbl_print(x...)  	printf(x);
 /**************************************************/
 #endif 
 /* end of 1imp.h */

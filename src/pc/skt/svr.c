@@ -24,92 +24,110 @@
 #include "1imp.h"
 
 /**************************************************/
-static int app_type;
-/**************************************************/
-void app_svr_init_skt(int type);
-void app_svr_init_skt(int type)
+int rbl_svr_init_skt(int type,int port);
+int rbl_svr_init_skt(int type,int port)
 {
-	app_type=type;
-	if(app_type==1)
+	int fd;
+	fd = -1;
+	if(type==1)
 	{
-	    tcp_svr_init_skt();
+	    fd = rbl_tcp_svr_init_skt(port);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-	    udp_svr_init_skt();
+	    fd = rbl_udp_svr_init_skt(port);
 	}
+	return fd;
+}
+
+int rbl_svr_conn_skt(int type,int skt_fd);
+int rbl_svr_conn_skt(int type,int skt_fd)
+{
+	int fd;
+	fd = -1;
+	if(type==1)
+	{
+	    fd = rbl_tcp_svr_conn_skt(skt_fd);
+	}
+	if(type==2)
+	{
+	    fd = rbl_udp_svr_conn_skt(skt_fd);
+	}
+	return fd;
 }
 /**************************************************/
-void app_svr_free_skt(void);
-void app_svr_free_skt(void)
+void rbl_svr_free_skt(int type,int skt_fd,int cnct_fd);
+void rbl_svr_free_skt(int type,int skt_fd,int cnct_fd)
 {
-	if(app_type==1)
+	if(type==1)
 	{
-		tcp_svr_free_skt();
+		rbl_tcp_svr_free_skt(skt_fd,cnct_fd);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		udp_svr_free_skt();
+		rbl_udp_svr_free_skt(skt_fd,cnct_fd);
 	}
 }
 
 /**************************************************/
-int app_svr_send_skt(char *buf,int size);
-int app_svr_send_skt(char *buf,int size)
+int rbl_svr_send_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr);
+int rbl_svr_send_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr)
 {
 	int sen_len;
-	if(app_type==1)
+	sen_len = 0;
+	if(type==1)
 	{
-		sen_len=tcp_svr_send_skt(buf,size);
+		sen_len=rbl_tcp_svr_send_skt(skt_fd,cnct_fd,buf,size);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		sen_len=udp_svr_send_skt(buf,size);
+		sen_len=rbl_udp_svr_send_skt(skt_fd,buf,size,addr);
 	}
    	return sen_len;
 }
 
 /**************************************************/
-int app_svr_recv_skt(char *buf,int size);
-int app_svr_recv_skt(char *buf,int size)
+int rbl_svr_recv_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr);
+int rbl_svr_recv_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr)
 {
     int rec_len;
-	if(app_type==1)
+    rec_len = 0;
+	if(type==1)
 	{
-		rec_len=tcp_svr_recv_skt(buf,size);
+		rec_len=rbl_tcp_svr_recv_skt(skt_fd,cnct_fd,buf,size);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		rec_len=udp_svr_recv_skt(buf,size);
+		rec_len=rbl_udp_svr_recv_skt(skt_fd,buf,size,addr);
 	}
    	return rec_len;
 }
 
 /**************************************************/
 #include <fcntl.h>
-void app_svr_set_nonblock(void);
-void app_svr_set_nonblock()
+void rbl_svr_set_nonblock(int type,int skt_fd);
+void rbl_svr_set_nonblock(int type,int skt_fd)
 {
-	if(app_type==1)
+	if(type==1)
 	{
-		tcp_svr_set_nonblock();
+		rbl_tcp_svr_set_nonblock(skt_fd);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		udp_svr_set_nonblock();
+		rbl_udp_svr_set_nonblock(skt_fd);
 	}
 }
 
-void app_svr_set_block(void);
-void app_svr_set_block()
+void rbl_svr_set_block(int type,int skt_fd);
+void rbl_svr_set_block(int type,int skt_fd)
 {
-	if(app_type==1)
+	if(type==1)
 	{
-		tcp_svr_set_block();
+		rbl_tcp_svr_set_block(skt_fd);
 	}
-	if(app_type==2)
+	if(type==2)
 	{
-		udp_svr_set_block();
+		rbl_udp_svr_set_block(skt_fd);
 	}
 }
 /* end of svr.c */

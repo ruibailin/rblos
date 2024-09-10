@@ -11,23 +11,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define aci_print(x...)  	printf(x)
-#define lte_print(x...)  	printf(x)
 /*------------------------------------*/
 static void print_ascii(char c);
 static void print_ascii(char c)
 {
 	if(c <' ')
 	{
-		lte_print("%c  ", '.');
+		rbl_print("%c  ", '.');
 		return;
 	}
 	if(c<127)
 	{
-		lte_print("%c  ", c);
+		rbl_print("%c  ", c);
 		return;
 	}
-	lte_print("%c  ", '.');
+	rbl_print("%c  ", '.');
 }
 
 static void print_hex(char c);
@@ -36,46 +34,46 @@ static void print_hex(char c)
 	int j;
 	j=(int)c;
 	j &= 0x000000FF;
-	aci_print("%02X ", j);
+	rbl_print("%02X ", j);
 }
 /*------------------------------------*/
 static void print_sperator_line(void);
 static void print_sperator_line(void)
 {
 	int i;
-	aci_print("\r\n|");
+	rbl_print("\r\n|");
 	for(i=0; i<16; i++)
-		aci_print("---");
-	aci_print("|  ");
+		rbl_print("---");
+	rbl_print("|  ");
 
-	aci_print("|");
+	rbl_print("|");
 	for(i=0; i<16; i++)
-		aci_print("===");
-	aci_print("|\r\n");
+		rbl_print("===");
+	rbl_print("|\r\n");
 }
 
 static void print_string_line(char *data,int size);
 static void print_string_line(char *data,int size)
 {
 	int i;
-	aci_print("\r\n|");
+	rbl_print("\r\n|");
 	for(i=0; i<size; i++)
 		print_hex(data[i]);
 	for(i=size; i<16; i++)
-		aci_print("   ");
-	aci_print("|  ");
+		rbl_print("   ");
+	rbl_print("|  ");
 
-	aci_print("|");
+	rbl_print("|");
 	for(i=0; i<size; i++)
 		print_ascii(data[i]);
 	for(i=size; i<16; i++)
-		aci_print("   ");
-	aci_print("|\r\n");
+		rbl_print("   ");
+	rbl_print("|\r\n");
 }
 
 
-void skt_log_packet(char *data, int size);
-void skt_log_packet(char *data, int size)
+void rbl_log_packet(char *data, int size);
+void rbl_log_packet(char *data, int size)
 {
 	int i,j;
 	int row;
@@ -89,16 +87,19 @@ void skt_log_packet(char *data, int size)
 	print_sperator_line();
 }
 
-void skt_log_hex(char data);
-void skt_log_hex(char data)
+/*------------------------------------*/
+#include <string.h>
+void rbl_log_ip(char *buf,unsigned int ip_int);
+void rbl_log_ip(char *buf,unsigned int ip_int)
 {
-	print_hex(data);
-}
-
-void skt_log_ascii(char data);
-void skt_log_ascii(char data)
-{
-	print_ascii(data);
+	char temp[16];
+	char ip[4];
+	memcpy(ip,(char *)&ip_int,4);
+    sprintf(temp,"%d.%d.%d.%d",ip[0], ip[1], ip[2], ip[3]);
+    rbl_print("input IP address:%s\r\n",temp);
+    if(buf==0x0L)
+    	return;
+    strcpy(buf,temp);
 }
 /*================================================================*/
 /* end of log.c */
