@@ -11,8 +11,8 @@
  */
 
 
-#ifndef CLT_H_
-#define CLT_H_
+#ifndef SKT_CLT_H_
+#define SKT_CLT_H_
 
 extern int rbl_clt_init_skt(int type,char *server_ip,int port);		//type=1:TCP;type=2:UDP
 extern void rbl_clt_free_skt(int type,int skt_fd);

@@ -25,6 +25,8 @@ static void test_clt()
 	if(skt_fd < 0)
 	{
 		skt_fd = rbl_clt_init_skt(main_type,main_ip,main_port);
+		if(skt_fd < 0)
+			return;
 		rbl_clt_set_nonblock(main_type,skt_fd);
 		return;
 	}
@@ -46,7 +48,7 @@ static void test_clt()
 	}
 }
 
-static struct sockaddr udp_clt_addr;
+static char udp_clt_addr[24];  //sizeof(struct sockaddr) =  16
 static void test_svr()
 {
 	int ret;
@@ -54,22 +56,22 @@ static void test_svr()
 	{
 		skt_fd = rbl_svr_init_skt(main_type,main_port);
 		rbl_svr_set_nonblock(main_type,skt_fd);
-		cnct_fd = rbl_svr_conn_skt(main_type,skt_fd,&udp_clt_addr);
+		cnct_fd = rbl_svr_conn_skt(main_type,skt_fd,udp_clt_addr);
 		printf("blocked 1\r\n");
 		return;
 	}
 	else if(cnct_fd<0)
 	{
-		cnct_fd = rbl_svr_conn_skt(main_type,skt_fd,&udp_clt_addr);
+		cnct_fd = rbl_svr_conn_skt(main_type,skt_fd,udp_clt_addr);
 		printf("blocked 2\r\n");
 	}
 	else
 	{
-		ret=rbl_svr_recv_skt(main_type,skt_fd,cnct_fd,rec,480,(struct sockaddr *)&udp_clt_addr);
+		ret=rbl_svr_recv_skt(main_type,skt_fd,cnct_fd,rec,480,udp_clt_addr);
 		if(ret < 1)
 			return;
 		rbl_log_packet(rec,ret);
-		ret=rbl_svr_send_skt(main_type,skt_fd,cnct_fd,ac_cc,16,(struct sockaddr *)&udp_clt_addr);
+		ret=rbl_svr_send_skt(main_type,skt_fd,cnct_fd,ac_cc,16,udp_clt_addr);
 		if(ret!=16)
 			printf("Server Wrong send \r\n");
 	}

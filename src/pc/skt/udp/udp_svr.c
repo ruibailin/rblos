@@ -129,12 +129,14 @@ void rbl_udp_svr_free_skt(int skt_fd,int cnct_fd)
 
 /**************************************************/
 extern void rbl_log_packet(char *data, int size);
-int rbl_udp_svr_recv_skt(int skt_fd,char *buf,int size,struct sockaddr *addr);
-int rbl_udp_svr_recv_skt(int skt_fd,char *buf,int size,struct sockaddr *addr)
+int rbl_udp_svr_recv_skt(int skt_fd,char *buf,int size,void *clt_info);
+int rbl_udp_svr_recv_skt(int skt_fd,char *buf,int size,void *clt_info)
 {
 	if(skt_fd == -1)
 		return 0;
 
+	struct sockaddr *addr;
+	addr = (struct sockaddr *)clt_info;
 	int rec_len;
 	socklen_t length;
 	length=sizeof(struct sockaddr);
@@ -154,12 +156,14 @@ int rbl_udp_svr_recv_skt(int skt_fd,char *buf,int size,struct sockaddr *addr)
    	return rec_len;
 }
 /**************************************************/
-int rbl_udp_svr_send_skt(int skt_fd,char *buf,int size,struct sockaddr *addr);
-int rbl_udp_svr_send_skt(int skt_fd,char *buf,int size,struct sockaddr *addr)
+int rbl_udp_svr_send_skt(int skt_fd,char *buf,int size,void *clt_info);
+int rbl_udp_svr_send_skt(int skt_fd,char *buf,int size,void *clt_info)
 {
 	if(skt_fd == -1)
 		return 0;
 
+	struct sockaddr *addr;
+	addr = (struct sockaddr *)clt_info;
 	int sen_len;
 	socklen_t length;
 	length=sizeof(struct sockaddr);

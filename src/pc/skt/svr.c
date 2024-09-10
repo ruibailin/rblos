@@ -40,14 +40,14 @@ int rbl_svr_init_skt(int type,int port)
 	return fd;
 }
 
-int rbl_svr_conn_skt(int type,int skt_fd,struct sockaddr *addr);
-int rbl_svr_conn_skt(int type,int skt_fd,struct sockaddr *addr)
+int rbl_svr_conn_skt(int type,int skt_fd,void *clt_info);
+int rbl_svr_conn_skt(int type,int skt_fd,void *clt_info)
 {
 	int fd;
 	fd = -1;
 	if(type==1)
 	{
-	    fd = rbl_tcp_svr_conn_skt(skt_fd,addr);
+	    fd = rbl_tcp_svr_conn_skt(skt_fd,clt_info);
 	}
 	if(type==2)
 	{
@@ -70,8 +70,8 @@ void rbl_svr_free_skt(int type,int skt_fd,int cnct_fd)
 }
 
 /**************************************************/
-int rbl_svr_send_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr);
-int rbl_svr_send_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr)
+int rbl_svr_send_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,void *clt_info);
+int rbl_svr_send_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,void *clt_info)
 {
 	int sen_len;
 	sen_len = 0;
@@ -81,14 +81,14 @@ int rbl_svr_send_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct s
 	}
 	if(type==2)
 	{
-		sen_len=rbl_udp_svr_send_skt(skt_fd,buf,size,addr);
+		sen_len=rbl_udp_svr_send_skt(skt_fd,buf,size,clt_info);
 	}
    	return sen_len;
 }
 
 /**************************************************/
-int rbl_svr_recv_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr);
-int rbl_svr_recv_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct sockaddr *addr)
+int rbl_svr_recv_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,void *clt_info);
+int rbl_svr_recv_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,void *clt_info)
 {
     int rec_len;
     rec_len = 0;
@@ -98,7 +98,7 @@ int rbl_svr_recv_skt(int type,int skt_fd,int cnct_fd,char *buf,int size,struct s
 	}
 	if(type==2)
 	{
-		rec_len=rbl_udp_svr_recv_skt(skt_fd,buf,size,addr);
+		rec_len=rbl_udp_svr_recv_skt(skt_fd,buf,size,clt_info);
 	}
    	return rec_len;
 }
