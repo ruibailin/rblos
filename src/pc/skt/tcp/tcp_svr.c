@@ -93,19 +93,30 @@ static int svr_listen_skt(int skt_fd,int port)
 	return -1;
 }
 /**************************************************/
-static int svr_connect_skt(int skt_fd);
-static int svr_connect_skt(int skt_fd)
+static int svr_connect_skt(int skt_fd,struct sockaddr *addr);
+static int svr_connect_skt(int skt_fd,struct sockaddr *addr)
 {
 	if(skt_fd == -1)
 		return -1;
 
 	int cnct_fd;
-    cnct_fd = accept(skt_fd, (struct sockaddr*)NULL, NULL);
+	socklen_t length;
+	length=sizeof(struct sockaddr);
+    cnct_fd = accept(skt_fd, (struct sockaddr*)addr, &length);
     if( cnct_fd != -1)
     {
-    	rbl_print("TCP Server accept new socket %d\r\n",cnct_fd);
+		char ip_addr[16];
+		unsigned int port;
+		port = addr->sa_data[0];
+		port <<= 8;
+		port += addr->sa_data[1];
+		port &= 0xFFFF;
+		sprintf(ip_addr,"%d.%d.%d.%d",addr->sa_data[2],addr->sa_data[3],addr->sa_data[4],addr->sa_data[5]);
+    	rbl_print("TCP Server accept new socket %d from IP %s,port %d\r\n",cnct_fd,ip_addr,port);
     	return cnct_fd;
     }
+    if(errno == 11)
+    	return -1;
 
    	rbl_print("TCP Server accept socket error: %s(errno: %d)",strerror(errno),errno);
     close(skt_fd);
@@ -146,11 +157,11 @@ int rbl_tcp_svr_init_skt(int port)
    	return skt_fd;
 }
 
-int rbl_tcp_svr_conn_skt(int skt_fd);
-int rbl_tcp_svr_conn_skt(int skt_fd)
+int rbl_tcp_svr_conn_skt(int skt_fd,struct sockaddr *addr);
+int rbl_tcp_svr_conn_skt(int skt_fd,struct sockaddr *addr)
 {
 	int cnct_fd;
-   	cnct_fd = svr_connect_skt(skt_fd);
+   	cnct_fd = svr_connect_skt(skt_fd,addr);
    	return cnct_fd;
 }
 /**************************************************/

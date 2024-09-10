@@ -40,14 +40,14 @@ int rbl_svr_init_skt(int type,int port)
 	return fd;
 }
 
-int rbl_svr_conn_skt(int type,int skt_fd);
-int rbl_svr_conn_skt(int type,int skt_fd)
+int rbl_svr_conn_skt(int type,int skt_fd,struct sockaddr *addr);
+int rbl_svr_conn_skt(int type,int skt_fd,struct sockaddr *addr)
 {
 	int fd;
 	fd = -1;
 	if(type==1)
 	{
-	    fd = rbl_tcp_svr_conn_skt(skt_fd);
+	    fd = rbl_tcp_svr_conn_skt(skt_fd,addr);
 	}
 	if(type==2)
 	{

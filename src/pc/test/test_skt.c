@@ -53,8 +53,15 @@ static void test_svr()
 	if(skt_fd<0)
 	{
 		skt_fd = rbl_svr_init_skt(main_type,main_port);
-		cnct_fd = rbl_svr_conn_skt(main_type,skt_fd);
+		rbl_svr_set_nonblock(main_type,skt_fd);
+		cnct_fd = rbl_svr_conn_skt(main_type,skt_fd,&udp_clt_addr);
+		printf("blocked 1\r\n");
 		return;
+	}
+	else if(cnct_fd<0)
+	{
+		cnct_fd = rbl_svr_conn_skt(main_type,skt_fd,&udp_clt_addr);
+		printf("blocked 2\r\n");
 	}
 	else
 	{
