@@ -81,6 +81,8 @@ static int clt_connect_skt(int skt_fd,char *ip,int port)
     	rbl_print("TCP Client connect socket %d\r\n to IP\r\n",skt_fd);
     	return 0;
     }
+    if(errno == 111)
+    	return -1;
 
    	rbl_print("TCP Client connect socket error: %s(errno: %d)",strerror(errno),errno);
    	close(skt_fd);
@@ -109,9 +111,13 @@ int rbl_tcp_clt_init_skt(char *ip,int port)
     skt_fd = clt_create_skt();
     if(skt_fd<0)
     	return -1;
-    clt_bind_skt(skt_fd,ip,port);
-
-	clt_connect_skt(skt_fd,ip,port);
+    int ret;
+    ret = clt_bind_skt(skt_fd,ip,port);
+	if(ret<0)
+		return -1;
+	ret = clt_connect_skt(skt_fd,ip,port);
+	if(ret<0)
+		return -1;
 	return skt_fd;
 }
 /**************************************************/
